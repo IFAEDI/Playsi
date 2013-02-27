@@ -6,6 +6,7 @@ import views.html.entreprises.entretiens;
 import views.html.main;
 import views.html.entreprises.rifs;
 import views.html.entreprises.conferences;
+import views.html.entreprises.parrainage;
 
 public class Entreprises extends Controller {
 
@@ -27,7 +28,6 @@ public class Entreprises extends Controller {
     }
 
     public static Result parrainage() {
-        // TODO
-        return TODO;
+        return ok(main.render("Entreprises - Parrainage", parrainage.render()));
     }
 }
