@@ -13,7 +13,8 @@ GET     /etudiants/cvs              controllers.Etudiants.cvs()
 GET     /etudiants/evenements       controllers.Etudiants.evenements()
 
 GET     /entreprises/rifs           controllers.Entreprises.rifs()
-GET     /entreprises/entretiens     controllers.Entreprises.entretiens()
+GET     /entreprises/entretiens     controllers.Entreprises.entretiens_presentation()
+GET     /entreprises/entretiens/inscription     controllers.Entreprises.entretiens_inscription()
 GET     /entreprises/conferences    controllers.Entreprises.conferences()
 GET     /entreprises/parrainage     controllers.Entreprises.parrainage()
 
