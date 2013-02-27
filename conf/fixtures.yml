@@ -1,0 +1,28 @@
+stages:
+  - !!models.Stage
+    titre: Implémentation d'un algorithme de kéké
+    annee: 5
+    duree: 6
+    lieu: Sophia Antibolosse
+    entreprise: Camera Coffee
+    contact: jeanclaudecusse@hotmail.fr
+    lien_fichier: notfound.zip
+    description: Un stage qu'il a l'air bien.
+  - !!models.Stage
+    titre: Etude de l'existant opérationnel métier
+    annee: 4
+    duree: 3
+    lieu: Paris, là où il fait gris
+    entreprise: Pipocorp
+    contact: jean-philippe.duchemin@relou.fr
+    lien_fichier: SI.zip
+    description: Dans une optique gagnant-gagnant, le stagiaire va optimiser ses compétences inter-transactionnelles.
+  - !!models.Stage
+    titre: Implémentation de tests
+    annee: 3
+    duree: 2
+    lieu: Lyon
+    entreprise: Noob inc.
+    lien_fichier: rien.zip
+    contact: poney_roxx69@caramail.fr
+    description: KIKOU LAY ZAMIS.

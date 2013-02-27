@@ -12,6 +12,8 @@ GET     /etudiants/stages           controllers.Etudiants.stages()
 GET     /etudiants/cvs              controllers.Etudiants.cvs()
 GET     /etudiants/evenements       controllers.Etudiants.evenements()
 
+POST     /etudiants/api/stages       controllers.Etudiants.apiStages()
+
 GET     /entreprises/rifs           controllers.Entreprises.rifs()
 GET     /entreprises/entretiens     controllers.Entreprises.entretiens_presentation()
 GET     /entreprises/entretiens/inscription     controllers.Entreprises.entretiens_inscription()
