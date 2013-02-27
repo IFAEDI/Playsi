@@ -5,6 +5,7 @@ import play.mvc.Result;
 import views.html.entreprises.entretiens;
 import views.html.main;
 import views.html.entreprises.rifs;
+import views.html.entreprises.conferences;
 
 public class Entreprises extends Controller {
 
@@ -22,8 +23,7 @@ public class Entreprises extends Controller {
     }
 
     public static Result conferences() {
-        // TODO
-        return TODO;
+        return ok(main.render("Entreprises - Conférences", conferences.render()));
     }
 
     public static Result parrainage() {
