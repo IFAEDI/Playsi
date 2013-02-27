@@ -58,7 +58,7 @@
 					<input id="mots_cles" type="text" class="input-medium search-query" placeholder="Mots-clés">
 					<button  id="submit_recherche" type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i> Rechercher</button>
 							<select id="annee">
-								<option value="">Toutes années</option>
+								<option value="0">Toutes années</option>
 								<option value="3">3ème année</option>
 								<option value="4">4ème année</option>
 								<option value="5">5ème année (PFE)</option>
@@ -92,10 +92,6 @@
 
 </div>
 
-<script>
-        var Stages = {};
-        Stages.url_cible = "@routes.Etudiants.apiStages()";
-</script>
 <script src="@routes.Assets.at("javascripts/etudiants/stages.js")"></script>
 <script src="@routes.Assets.at("javascripts/handlebars-1.0.0.beta.6.js")"></script>
 }

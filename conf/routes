@@ -6,13 +6,15 @@
 GET     /                           controllers.StaticPages.index()
 GET     /apropos                    controllers.StaticPages.apropos()
 GET     /contact                    controllers.StaticPages.contact()
+GET     /jsroutes                   controllers.StaticPages.javascriptRoutes()
 
+# domaine Etudiants
 GET     /etudiants/entretiens       controllers.Etudiants.entretiens()
 GET     /etudiants/stages           controllers.Etudiants.stages()
 GET     /etudiants/cvs              controllers.Etudiants.cvs()
 GET     /etudiants/evenements       controllers.Etudiants.evenements()
 
-POST     /etudiants/api/stages       controllers.Etudiants.apiStages()
+POST     /etudiants/api/stages/     controllers.Etudiants.apiStages(mots_cles_str: String, annee: Integer, lieu: String, entreprise: String)
 
 GET     /entreprises/rifs           controllers.Entreprises.rifs()
 GET     /entreprises/entretiens     controllers.Entreprises.entretiens_presentation()

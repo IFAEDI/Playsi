@@ -19,6 +19,7 @@ public class StageService {
 
     private static Finder<Long, Stage> finder = new Finder<Long, Stage>(Long.class, Stage.class);
 
+    // TODO discuter de la fonctionnalité chercher par durée?
     public static List<Stage> chercherStages(String[] mots_cles, Integer annee, Integer duree, String lieu, String entreprise) {
         ExpressionList<Stage> exp = finder.where();
 
@@ -28,8 +29,8 @@ public class StageService {
             boolean premierOr = true;
             Expression chaineOr = null;
             for( String m : mots_cles ) {
-                Expression e = Expr.or( Expr.like("titre", "%".concat(m.concat("%"))),
-                        Expr.like("description", "%".concat(m.concat("%"))));
+                Expression e = Expr.or( Expr.ilike("titre", "%".concat(m.concat("%"))),
+                        Expr.ilike("description", "%".concat(m.concat("%"))));
                 if( premierOr ) {
                     chaineOr = e;
                     premierOr = false;
@@ -41,6 +42,7 @@ public class StageService {
         }
 
         if(annee != null) {
+            // TODO ajouter gestion des multi années comme présent en bdd du département (7, 9)
             exp.eq("annee", annee);
         }
 
@@ -49,11 +51,11 @@ public class StageService {
         }
 
         if( lieu != null ) {
-            exp.like("lieu", "%".concat(lieu.concat("%")));
+            exp.ilike("lieu", "%".concat(lieu.concat("%")));
         }
 
         if( entreprise != null ) {
-            exp.like("entreprise", entreprise);
+            exp.ilike("entreprise", entreprise);
         }
 
         return exp.findList();
