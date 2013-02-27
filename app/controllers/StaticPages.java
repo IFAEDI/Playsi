@@ -2,9 +2,7 @@ package controllers;
 
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.a_propos;
-import views.html.index;
-import views.html.main;
+import views.html.*;
 
 public class StaticPages extends Controller {
 
@@ -17,7 +15,7 @@ public class StaticPages extends Controller {
     }
 
     public static Result contact() {
-        return TODO;
+        return ok(main.render("Contact", contact.render()));
     }
 
 }

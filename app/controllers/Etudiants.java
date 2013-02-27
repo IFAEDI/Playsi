@@ -13,18 +13,22 @@ import play.mvc.Result;
 public class Etudiants extends Controller {
 
     public static Result entretiens() {
+        // TODO
         return TODO;
     }
 
     public static Result stages() {
+        // TODO
         return TODO;
     }
 
     public static Result cvs() {
+        // TODO
         return TODO;
     }
 
     public static Result evenements() {
+        // TODO
         return TODO;
     }
 }
