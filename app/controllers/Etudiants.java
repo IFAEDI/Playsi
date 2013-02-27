@@ -2,9 +2,7 @@ package controllers;
 
 import play.mvc.Controller;
 import play.mvc.Result;
-
 import views.html.etudiants.evenements;
-import views.html.main;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +29,6 @@ public class Etudiants extends Controller {
     }
 
     public static Result evenements() {
-        return ok(main.render("Evènements étudiants", evenements.render()));
+        return ok(evenements.render());
     }
 }

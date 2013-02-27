@@ -2,16 +2,15 @@ package controllers;
 
 import play.mvc.Controller;
 import play.mvc.Result;
-import views.html.entreprises.entretiens;
-import views.html.main;
-import views.html.entreprises.rifs;
 import views.html.entreprises.conferences;
+import views.html.entreprises.entretiens;
 import views.html.entreprises.parrainage;
+import views.html.entreprises.rifs;
 
 public class Entreprises extends Controller {
 
     public static Result rifs() {
-        return ok(main.render("Entreprises - Rencontres IFs", rifs.render()));
+        return ok(rifs.render());
     }
 
     public static Result entretiens_inscription() {
@@ -20,14 +19,14 @@ public class Entreprises extends Controller {
     }
 
     public static Result entretiens_presentation() {
-        return ok(main.render("Entreprises - Simulations d'entretiens", entretiens.render()));
+        return ok(entretiens.render());
     }
 
     public static Result conferences() {
-        return ok(main.render("Entreprises - Conférences", conferences.render()));
+        return ok(conferences.render());
     }
 
     public static Result parrainage() {
-        return ok(main.render("Entreprises - Parrainage", parrainage.render()));
+        return ok(parrainage.render());
     }
 }
