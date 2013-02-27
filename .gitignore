@@ -30,3 +30,4 @@ test-result
 server.pid
 *.iml
 *.eml
+*Thumbs.db

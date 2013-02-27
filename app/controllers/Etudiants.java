@@ -3,6 +3,9 @@ package controllers;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import views.html.etudiants.evenements;
+import views.html.main;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Benjamin
@@ -28,7 +31,6 @@ public class Etudiants extends Controller {
     }
 
     public static Result evenements() {
-        // TODO
-        return TODO;
+        return ok(main.render("Evènements étudiants", evenements.render()));
     }
 }
