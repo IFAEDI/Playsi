@@ -2,12 +2,13 @@ package controllers;
 
 import play.mvc.Controller;
 import play.mvc.Result;
+import views.html.main;
+import views.html.entreprises.rifs;
 
 public class Entreprises extends Controller {
 
     public static Result rifs() {
-        // TODO
-        return TODO;
+        return ok(main.render("Entreprises - Rencontres IFs", rifs.render()));
     }
 
     public static Result entretiens() {
