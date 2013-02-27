@@ -2,9 +2,20 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
+# Static pages
 GET     /                           controllers.StaticPages.index()
 GET     /apropos                    controllers.StaticPages.apropos()
+GET     /contact                    controllers.StaticPages.contact()
+
+GET     /etudiants/entretiens       controllers.Etudiants.entretiens()
+GET     /etudiants/stages           controllers.Etudiants.stages()
+GET     /etudiants/cvs              controllers.Etudiants.cvs()
+GET     /etudiants/evenements       controllers.Etudiants.evenements()
+
+GET     /entreprises/rifs           controllers.Entreprises.rifs()
+GET     /entreprises/entretiens     controllers.Entreprises.entretiens()
+GET     /entreprises/conferences    controllers.Entreprises.conferences()
+GET     /entreprises/parrainage     controllers.Entreprises.parrainage()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

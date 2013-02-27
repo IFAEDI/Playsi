@@ -542,7 +542,7 @@ Handlebars.log = function(level, str) { Handlebars.logger.log(level, str); };
   Handlebars.AST.PartialNode = function(id, context) {
     this.type    = "partial";
 
-    // TODO: disallow complex IDs
+    // to do: disallow complex IDs
 
     this.id      = id;
     this.context = context;

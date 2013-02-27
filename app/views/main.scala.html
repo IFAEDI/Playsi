@@ -56,21 +56,15 @@
 
                                 <li class="nav-header"><i class="icon-road"></i> Espace Pro.</li>
 
-                                <li><a href="#">fake link</a></li>
-                                <!-- TODO add links as soon as it's done
-                                <li><a href="index.php?page=Entretiens_Etudiant">Simulations d'entretiens</a></li>
-                                <li><a href="index.php?page=Stages_Etudiant">Stages</a></li>
-                                <li><a href="index.php?page=CV_Etudiant">CV</a></li>
-                                -->
+                                <li><a href="@routes.Etudiants.entretiens()">Simulations d'entretiens</a></li>
+                                <li><a href="@routes.Etudiants.stages()">Stages</a></li>
+                                <li><a href="@routes.Etudiants.cvs()">CV</a></li>
 
                                 <li class="divider"></li>
 
                                 <li class="nav-header"><i class="icon-glass"></i> Evènements</li>
 
-                                <li><a href="#">fake link</a></li>
-                                <!-- TODO add links as soon as it's done
-                                <li><a href="index.php?page=Evenements_Etudiant">Présentation</a></li>
-                                -->
+                                <li><a href="@routes.Etudiants.evenements()">Présentation</a></li>
                             </ul>
                         </li>
                         <li class="divider-vertical"></li>
@@ -78,37 +72,34 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-flag icon-white"></i> Entreprises <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li class="nav-header"><i class="icon-star"></i> Evénements</li>
-                                    <!-- TODO add links as soon as it's done
-                                <li><a href="index.php?page=RIFs_Entreprise">Rencontres IF</a></li>
-                                <li><a href="index.php?page=Entretiens_Entreprise">Simulations d'entretiens</a></li>
-                                <li><a href="index.php?page=Conferences">Conférences</a></li>
-                                -->
+
+                                <li><a href="@routes.Entreprises.rifs()">Rencontres IF</a></li>
+                                <li><a href="@routes.Entreprises.entretiens()">Simulations d'entretiens</a></li>
+                                <li><a href="@routes.Entreprises.conferences()">Conférences</a></li>
 
                                 <li class="divider"></li>
 
+
+                                <!-- TODO add link as soon as it's done
                                 <li class="nav-header"><i class="icon-book"></i> CVthèque</li>
 
-                                    <!-- TODO add links as soon as it's done
                                 <li><a href="index.php?page=CV_Info">Offre</a></li>
                                 -->
 
                                 <li class="divider"></li>
 
                                 <li class="nav-header"><i class="icon-search"></i> Informations</li>
-                                    <!-- TODO add links as soon as it's done
-                                <li><a href="index.php?page=Parrainage">Devenir parrain de promotion</a></li>
-                                -->
+                                <li><a href="@routes.Entreprises.parrainage()">Devenir parrain de promotion</a></li>
                             </ul>
                         </li>
+
                         <!-- TODO add admin sections for AEDI and ADMIN for authentified people (menu.php)
                             -->
 
                         <li class="divider-vertical"></li>
-                            <!-- TODO add links as soon as it's done
-                        <li class=""><a href="index.php?page=A_Propos"><i class="icon-info-sign icon-white"></i> A propos</a></li>
+                        <li class=""><a href="@routes.StaticPages.apropos()"><i class="icon-info-sign icon-white"></i> A propos</a></li>
 
-                        <li class=""><a href="index.php?page=Contact"><i class="icon-envelope icon-white"></i> Contact</a></li>
-                        -->
+                        <li class=""><a href="@routes.StaticPages.contact()"><i class="icon-envelope icon-white"></i> Contact</a></li>
 
                         <li class="divider-vertical"></li>
 

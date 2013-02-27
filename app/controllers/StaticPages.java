@@ -16,4 +16,8 @@ public class StaticPages extends Controller {
         return ok(main.render("A propos", a_propos.render()));
     }
 
+    public static Result contact() {
+        return TODO;
+    }
+
 }
