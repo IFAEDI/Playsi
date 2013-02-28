@@ -20,9 +20,13 @@ public class Constantes {
     public static final String SESSION_ID = "session_id";
     public static final String SESSION_UTILISATEUR_SUFFIXE = ".utilisateur";
 
-    public static final int TYPE_AUTH_REGULIERE = 0;
-    public static final int TYPE_AUTH_CAS = 0;
-
     public static final String JSON_AUTH_REGULIERE = "regular_auth";
+
+    public static final String ROLE_ADMIN = "Administrateur";
+    public static final String ROLE_AEDI = "Membre de l'AEDI";
+    public static final String ROLE_ENSEIGNANT = "Enseignant";
+    public static final String ROLE_ENTREPRISE = "Entreprise";
+    public static final String ROLE_ETUDIANT = "Etudiant";
+    public static final String ROLE_INCONNU = "Inconnu";
 
 }

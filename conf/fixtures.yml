@@ -30,5 +30,9 @@ users:
   - !!models.Utilisateur
     login: root
     passwd: 435b41068e8665513a20070c033b08b9c66e4332
-    auth_service: 0
+    auth_service: REGULIERE
     banni: no
+    nom: Admin
+    prenom: John
+    premiereConnexion: no
+    role: ADMIN

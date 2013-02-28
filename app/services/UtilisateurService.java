@@ -1,6 +1,5 @@
 package services;
 
-import controllers.Utils.Constantes;
 import models.Utilisateur;
 import play.db.ebean.Model;
 
@@ -34,7 +33,7 @@ public class UtilisateurService {
             Utilisateur utilisateur =
                 finder.where().eq(Utilisateur.DB_LOGIN, username)
                         .eq(Utilisateur.DB_PASSWORD, password)
-                        .eq(Utilisateur.DB_AUTH_SERVICE, Constantes.TYPE_AUTH_REGULIERE)
+                        .eq(Utilisateur.DB_AUTH_SERVICE, Utilisateur.TYPE_AUTH.REGULIERE)
                         .findUnique();
 
             if( utilisateur != null ) {

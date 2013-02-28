@@ -1,10 +1,10 @@
 package models;
 
+import com.avaje.ebean.validation.Length;
 import controllers.Utils.Constantes;
-import play.db.ebean.Model;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,25 +14,44 @@ import javax.persistence.Id;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class Utilisateur extends Model {
-    @Id
-    private Long id;
+@DiscriminatorValue("U")
+public class Utilisateur extends Personne {
 
+    @Length(max=35)
     private String login;
+
+    @Length(max=50)
     private String passwd;
-    private Integer auth_service;
+    private TYPE_AUTH auth_service;
     private Boolean banni;
+
+    public enum TYPE_AUTH {
+        REGULIERE,
+        CAS
+    }
 
     public static final String DB_LOGIN = "login";
     public static final String DB_PASSWORD = "passwd";
     public static final String DB_AUTH_SERVICE = "auth_service";
     public static final String DB_BANNI = "banni";
 
-    // TODO prenom, nom, role, méthode d'authentification
-    public String getPrenom() { return "John"; }
-    public String getNom() { return "Doe";}
-    public String getRole() { return "Admin"; }
-    public int getAuthentificationMethode() { return Constantes.TYPE_AUTH_REGULIERE; }
+    public String getRoleString() {
+        String roleStr = null;
+        if( role == Role.ADMIN ) {
+            roleStr = Constantes.ROLE_ADMIN;
+        } else if( role == Role.AEDI ) {
+            roleStr = Constantes.ROLE_AEDI;
+        } else if( role == Role.ENSEIGNANT ) {
+            roleStr = Constantes.ROLE_ENSEIGNANT;
+        } else if( role == Role.ENTREPRISE ) {
+            roleStr = Constantes.ROLE_ENTREPRISE;
+        } else if( role == Role.ETUDIANT ) {
+            roleStr = Constantes.ROLE_ETUDIANT;
+        } else {
+            roleStr = Constantes.ROLE_INCONNU;
+        }
+        return roleStr;
+    }
 
     // généré automatiquement
 
@@ -60,11 +79,11 @@ public class Utilisateur extends Model {
         this.passwd = passwd;
     }
 
-    public Integer getAuth_service() {
+    public TYPE_AUTH getAuth_service() {
         return auth_service;
     }
 
-    public void setAuth_service(Integer auth_service) {
+    public void setAuth_service(TYPE_AUTH auth_service) {
         this.auth_service = auth_service;
     }
 
