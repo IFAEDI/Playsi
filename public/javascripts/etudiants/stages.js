@@ -19,7 +19,7 @@ Stages.afficherResultats = function afficherResultats(json) {
 	$('#description').slideUp();
 
 	/* Test le code retour de la requête AJAX, si pas ok, affichage d'une erreur et <em>mesg</em> contient la raison. */
-	if (json.code != 'ok') {
+	if (json.statut != 'ok') {
 		$('#information').html('Impossible de récupérer le résultat.' +
 				'Merci de réessayer ultérieurement ou de contacter un administrateur.<br />' +
 				'Le serveur a renvoyé : <i>"' + json.mesg + '"</i>.' );
@@ -74,6 +74,8 @@ Stages.afficherResultats = function afficherResultats(json) {
 }
 
 $('document').ready(function() {
+
+    // TODO ajouter corrections de Bill @Aldream
 
 	$('#fenetre').hide();
 	$('#information').hide();
