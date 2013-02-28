@@ -1,5 +1,7 @@
 package controllers;
 
+import controllers.Utils.Constantes;
+import controllers.Utils.JsonUtils;
 import play.Routes;
 import play.cache.Cache;
 import play.mvc.Controller;
@@ -31,33 +33,29 @@ public class StaticPages extends Controller {
     }
 
     public static Result logout() {
-        // TODO class constantes
-        Cache.remove(session().get(UtilisateurService.SESSION_ID).concat(UtilisateurService.UTILISATEUR));
+        Cache.remove(session().get(Constantes.SESSION_ID).concat(Constantes.SESSION_UTILISATEUR_SUFFIXE));
         session().clear();
         return redirect(routes.StaticPages.index());
     }
 
-    public final static String AUTH_REGULIERE = "regular_auth";
-
     public static Result login(String action, String username, String password) {
-        // TODO auth service
-        if( action.equals(AUTH_REGULIERE) ) {
+        if( action.equals(Constantes.JSON_AUTH_REGULIERE) ) {
             UtilisateurService.LoginResult loginResult = UtilisateurService.loginRegulier(username, password);
             if( loginResult.statut == UtilisateurService.Statut.VARIABLES_MANQUANTES ) {
 
-                return badRequest(JsonUtils.genererReponseJson(JsonUtils.Statut.ERREUR, "Variables manquantes"));
+                return badRequest(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Variables manquantes"));
 
             } else if( loginResult.statut == UtilisateurService.Statut.OK ) {
 
                 session().clear();
                 String sessionId = UUID.randomUUID().toString();
-                session(UtilisateurService.SESSION_ID, sessionId);
-                Cache.set(sessionId.concat(UtilisateurService.UTILISATEUR), loginResult.utilisateur);
-                return ok( JsonUtils.genererReponseJson(JsonUtils.Statut.OK, "Authentification réussie."));
+                session(Constantes.SESSION_ID, sessionId);
+                Cache.set(sessionId.concat(Constantes.SESSION_UTILISATEUR_SUFFIXE), loginResult.utilisateur);
+                return ok( JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Authentification réussie."));
 
             } else if( loginResult.statut == UtilisateurService.Statut.IDENTIFIANTS_INVALIDES ) {
 
-                return ok( JsonUtils.genererReponseJson(JsonUtils.Statut.ERREUR, "Identifiants non valides"));
+                return ok( JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Identifiants non valides"));
             }
         }
         return badRequest();

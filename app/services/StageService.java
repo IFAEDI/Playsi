@@ -29,8 +29,8 @@ public class StageService {
             boolean premierOr = true;
             Expression chaineOr = null;
             for( String m : mots_cles ) {
-                Expression e = Expr.or( Expr.ilike("titre", "%".concat(m.concat("%"))),
-                        Expr.ilike("description", "%".concat(m.concat("%"))));
+                Expression e = Expr.or( Expr.ilike(Stage.DB_TITRE, "%".concat(m.concat("%"))),
+                        Expr.ilike(Stage.DB_DESCRIPTION, "%".concat(m.concat("%"))));
                 if( premierOr ) {
                     chaineOr = e;
                     premierOr = false;
@@ -43,19 +43,19 @@ public class StageService {
 
         if(annee != null) {
             // TODO ajouter gestion des multi années comme présent en bdd du département (7, 9)
-            exp.eq("annee", annee);
+            exp.eq(Stage.DB_ANNEE, annee);
         }
 
         if( duree != null ) {
-            exp.gt("duree", duree);
+            exp.gt(Stage.DB_DUREE, duree);
         }
 
         if( lieu != null ) {
-            exp.ilike("lieu", "%".concat(lieu.concat("%")));
+            exp.ilike(Stage.DB_LIEU, "%".concat(lieu.concat("%")));
         }
 
         if( entreprise != null ) {
-            exp.ilike("entreprise", entreprise);
+            exp.ilike(Stage.DB_ENTREPRISE, entreprise);
         }
 
         return exp.findList();

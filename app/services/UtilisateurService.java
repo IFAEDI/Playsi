@@ -1,6 +1,6 @@
 package services;
 
-import controllers.Securite;
+import controllers.Utils.Constantes;
 import models.Utilisateur;
 import play.db.ebean.Model;
 
@@ -19,9 +19,6 @@ public class UtilisateurService {
         OK
     }
 
-    public final static String SESSION_ID = "session_id";
-    public final static String UTILISATEUR = ".utilisateur";
-
     private static Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
 
     public static class LoginResult {
@@ -35,9 +32,9 @@ public class UtilisateurService {
             resultat.statut = Statut.VARIABLES_MANQUANTES;
         } else {
             Utilisateur utilisateur =
-                finder.where().eq("login", username)
-                        .eq("passwd", password)
-                        .eq("auth_service", Securite.AUTH_REGULIERE)
+                finder.where().eq(Utilisateur.DB_LOGIN, username)
+                        .eq(Utilisateur.DB_PASSWORD, password)
+                        .eq(Utilisateur.DB_AUTH_SERVICE, Constantes.TYPE_AUTH_REGULIERE)
                         .findUnique();
 
             if( utilisateur != null ) {

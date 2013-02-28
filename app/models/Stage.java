@@ -43,6 +43,13 @@ public class Stage extends Model {
 
     private String description;
 
+    public final static String DB_TITRE = "titre";
+    public final static String DB_ANNEE = "annee";
+    public final static String DB_DUREE = "duree";
+    public final static String DB_LIEU = "lieu";
+    public final static String DB_ENTREPRISE = "entreprise";
+    public final static String DB_DESCRIPTION = "description";
+
     public ObjectNode toJson() {
         ObjectNode json = Json.newObject();
 

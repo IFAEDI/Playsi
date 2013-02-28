@@ -1,5 +1,6 @@
 package controllers;
 
+import controllers.Utils.Constantes;
 import models.Utilisateur;
 import play.cache.Cache;
 import play.mvc.Http;
@@ -15,14 +16,11 @@ import play.mvc.Security;
  */
 public class Securite extends Security.Authenticator {
 
-    public static final int AUTH_REGULIERE = 0;
-    public static final int AUTH_CAS = 1;
-
     @Override
     public String getUsername(Context ctx) {
-        String sid = (String) ctx.session().get("session_id");
+        String sid = (String) ctx.session().get(Constantes.SESSION_ID);
         if( sid != null ) {
-            Utilisateur utilisateur = (Utilisateur) Cache.get(sid.concat(".utilisateur"));
+            Utilisateur utilisateur = (Utilisateur) Cache.get(sid.concat(Constantes.SESSION_UTILISATEUR_SUFFIXE));
             if( utilisateur == null ) {
                 ctx.session().clear();
                 return null;
@@ -40,9 +38,9 @@ public class Securite extends Security.Authenticator {
     }
 
     public static Boolean estConnecte() {
-        String sid = (String) Http.Context.current().session().get("session_id");
+        String sid = (String) Http.Context.current().session().get(Constantes.SESSION_ID);
         if( sid != null ) {
-            Utilisateur utilisateur = (Utilisateur) Cache.get(sid.concat(".utilisateur"));
+            Utilisateur utilisateur = (Utilisateur) Cache.get(sid.concat(Constantes.SESSION_UTILISATEUR_SUFFIXE));
             if( utilisateur == null ) {
                 Http.Context.current().session().clear();
                 return false;
@@ -55,8 +53,8 @@ public class Securite extends Security.Authenticator {
     }
 
     public static Utilisateur utilisateur() {
-        String sid = (String) Http.Context.current().session().get("session_id");
-        Utilisateur utilisateur = (Utilisateur) Cache.get(sid.concat(".utilisateur"));
+        String sid = (String) Http.Context.current().session().get(Constantes.SESSION_ID);
+        Utilisateur utilisateur = (Utilisateur) Cache.get(sid.concat(Constantes.SESSION_UTILISATEUR_SUFFIXE));
         return utilisateur;
     }
 }

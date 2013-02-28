@@ -1,5 +1,7 @@
 package controllers;
 
+import controllers.Utils.Constantes;
+import controllers.Utils.JsonUtils;
 import models.Stage;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
@@ -58,12 +60,12 @@ public class Etudiants extends Controller {
         List<Stage> stages = StageService.chercherStages(mots_cles, annee, null, lieu, entreprise);
 
         // conversion en json
-        ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.Statut.OK, "Résultats trouvés.");
+        ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Résultats trouvés.");
         ArrayNode jsonStages = new ArrayNode(JsonNodeFactory.instance);
         for( Stage s : stages ) {
             jsonStages.add( s.toJson() );
         }
-        json.put("stages", jsonStages);
+        json.put(Constantes.JSON_STAGES, jsonStages);
         return ok(json);
     }
 

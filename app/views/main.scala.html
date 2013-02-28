@@ -167,7 +167,7 @@
 					 <input class="input-medium disabled" style="margin: 0px;" id="username" type="text" disabled="disabled" value="@Securite.utilisateur().getLogin()" />
 					</div>
 				  </div>
-                    @if( Securite.utilisateur().getAuthentificationMethode().equals( Securite.AUTH_REGULIERE ) ) {
+                    @if( Securite.utilisateur().getAuthentificationMethode().equals( Utils.Constantes.TYPE_AUTH_REGULIERE ) ) {
 							 <div class="control-group">
 									<label class="control-label" for="password">Mot de passe</label>
 									<div class="controls">

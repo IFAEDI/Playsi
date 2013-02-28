@@ -1,6 +1,6 @@
 package models;
 
-import controllers.Securite;
+import controllers.Utils.Constantes;
 import play.db.ebean.Model;
 
 import javax.persistence.Entity;
@@ -23,11 +23,16 @@ public class Utilisateur extends Model {
     private Integer auth_service;
     private Boolean banni;
 
+    public static final String DB_LOGIN = "login";
+    public static final String DB_PASSWORD = "passwd";
+    public static final String DB_AUTH_SERVICE = "auth_service";
+    public static final String DB_BANNI = "banni";
+
     // TODO prenom, nom, role, méthode d'authentification
     public String getPrenom() { return "John"; }
     public String getNom() { return "Doe";}
     public String getRole() { return "Admin"; }
-    public int getAuthentificationMethode() { return Securite.AUTH_REGULIERE; }
+    public int getAuthentificationMethode() { return Constantes.TYPE_AUTH_REGULIERE; }
 
     // généré automatiquement
 

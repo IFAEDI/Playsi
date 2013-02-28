@@ -1,3 +1,4 @@
+import controllers.Utils.Constantes;
 import controllers.routes;
 import models.Stage;
 import org.codehaus.jackson.node.ObjectNode;
@@ -48,20 +49,20 @@ public class ApplicationTest {
     @Test
     public void testLoginOk() {
         Result result = callAction(
-                routes.ref.StaticPages.login("regular_auth", "root", "435b41068e8665513a20070c033b08b9c66e4332")
+                routes.ref.StaticPages.login(Constantes.JSON_AUTH_REGULIERE, "root", "435b41068e8665513a20070c033b08b9c66e4332")
         );
         assert( status(result) == 200 );
         ObjectNode collectedJson = (ObjectNode) Json.parse(contentAsString(result));
-        assertThat( collectedJson.has("statut") );
-        assertThat( collectedJson.get("statut").asText() ).isEqualTo("ok");
-        assertThat( session(result).containsKey("login") );
-        assertThat( session(result).get("login") ).isEqualTo("root");
+        assertThat( collectedJson.has(Constantes.JSON_STATUT) );
+        assertThat( collectedJson.get(Constantes.JSON_STATUT).asText() ).isEqualTo(Constantes.JSON_OK_STR);
+        assertThat( session(result).containsKey(Constantes.SESSION_ID) );
+        assertThat( session(result).get(Constantes.SESSION_ID) ).isNotEmpty();
     }
 
     @Test
     public void testLoginNok() {
         Result result = callAction(
-                routes.ref.StaticPages.login("regular_auth", "root", "tort")
+                routes.ref.StaticPages.login(Constantes.JSON_AUTH_REGULIERE, "root", "tort")
                 // et le tort tue
                 // et le tue meurt
                 // et le meurt trie
@@ -71,8 +72,8 @@ public class ApplicationTest {
 
         assert( status(result) == 200 );
         ObjectNode collectedJson = (ObjectNode) Json.parse(contentAsString(result));
-        assertThat( collectedJson.has("statut") );
-        assertThat( collectedJson.get("statut").asText() ).isNotEqualTo("ok");
-        assertThat( ! session(result).containsKey("login") );
+        assertThat( collectedJson.has(Constantes.JSON_STATUT) );
+        assertThat( collectedJson.get(Constantes.JSON_STATUT).asText() ).isNotEqualTo(Constantes.JSON_OK_STR);
+        assertThat( ! session(result).containsKey(Constantes.SESSION_ID) );
     }
 }
