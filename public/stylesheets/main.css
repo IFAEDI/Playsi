@@ -4,6 +4,10 @@ body {
     margin-top: 25px;
 }
 
+p {
+    text-align: justify;
+}
+
 /* tablesorter */
 
 table.tablesorter thead tr .header {
@@ -38,11 +42,6 @@ table.tablesorter thead tr .headerSortDown {
 .centre
 {
     text-align:center;
-}
-
-.justify
-{
-    text-align:justify;
 }
 
 .comment{
