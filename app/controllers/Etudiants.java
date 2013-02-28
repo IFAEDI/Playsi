@@ -5,9 +5,9 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import play.Logger;
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 import services.StageService;
 import views.html.etudiants.evenements;
 import views.html.etudiants.stages;
@@ -21,6 +21,7 @@ import java.util.List;
  * Time: 16:27
  * To change this template use File | Settings | File Templates.
  */
+
 public class Etudiants extends Controller {
 
     public static Result entretiens() {
@@ -28,10 +29,12 @@ public class Etudiants extends Controller {
         return TODO;
     }
 
+    @Security.Authenticated(Securite.class)
     public static Result stages() {
         return ok(stages.render());
     }
 
+    @Security.Authenticated(SecuriteAPI.class)
     public static Result apiStages(String mots_cles_str, Integer annee, String lieu, String entreprise) {
 
         String[] mots_cles = null;
@@ -55,8 +58,7 @@ public class Etudiants extends Controller {
         List<Stage> stages = StageService.chercherStages(mots_cles, annee, null, lieu, entreprise);
 
         // conversion en json
-        ObjectNode json = Json.newObject();
-        json.put("code", "ok");
+        ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.Statut.OK, "Résultats trouvés.");
         ArrayNode jsonStages = new ArrayNode(JsonNodeFactory.instance);
         for( Stage s : stages ) {
             jsonStages.add( s.toJson() );

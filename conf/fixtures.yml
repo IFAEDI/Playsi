@@ -26,3 +26,9 @@ stages:
     lien_fichier: rien.zip
     contact: poney_roxx69@caramail.fr
     description: KIKOU LAY ZAMIS.
+users:
+  - !!models.Utilisateur
+    login: root
+    passwd: 435b41068e8665513a20070c033b08b9c66e4332
+    auth_service: 0
+    banni: no

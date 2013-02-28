@@ -8,6 +8,7 @@
 
 import com.avaje.ebean.Ebean;
 import models.Stage;
+import models.Utilisateur;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
@@ -23,9 +24,14 @@ public class Global extends GlobalSettings {
         Logger.info("Insertion de valeurs en bdd...");
         Map<String, List<Object> > fixtures = (Map<String, List<Object>>) Yaml.load("fixtures.yml");
 
-        Model.Finder<Long, Stage> finder = new Model.Finder<Long, Stage>(Long.class, Stage.class);
-        if(finder.findRowCount() == 0) {
+        Model.Finder<Long, Stage> stagesFinder = new Model.Finder<Long, Stage>(Long.class, Stage.class);
+        if(stagesFinder.findRowCount() == 0) {
             Ebean.save(fixtures.get("stages"));
+        }
+
+        Model.Finder<Long, Utilisateur> utilisateurFinder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
+        if( utilisateurFinder.findRowCount() == 0 ) {
+            Ebean.save(fixtures.get("users"));
         }
 
         Logger.info("Insertion de valeurs en bdd: Fait.");

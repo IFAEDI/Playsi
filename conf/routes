@@ -8,6 +8,10 @@ GET     /apropos                    controllers.StaticPages.apropos()
 GET     /contact                    controllers.StaticPages.contact()
 GET     /jsroutes                   controllers.StaticPages.javascriptRoutes()
 
+POST    /login                      controllers.StaticPages.login(action: String, username: String, password: String)
+GET     /logout                     controllers.StaticPages.logout()
+GET     /auth                       controllers.StaticPages.authRequise()
+
 # domaine Etudiants
 GET     /etudiants/entretiens       controllers.Etudiants.entretiens()
 GET     /etudiants/stages           controllers.Etudiants.stages()

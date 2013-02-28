@@ -1,13 +1,11 @@
 /**************************************************
-* Author : Sébastien Mériot			  *
-* Date : 25.03.2012				  *
+* Author : Sébastien Mériot			              *
+* Date : 25.03.2012				                  *
 * Description : Gestion de l'authentification par *
 * le CAS ou de façon plus classique (user/pass)	  *
 **************************************************/
 
-
 $(document).ready( function() {
-
 	/* Enregistrement des handlers */
 	$( "a#cas_login" ).click( cas_login );
 	$( "a#regular_login" ).click( regular_login );
@@ -20,7 +18,7 @@ $(document).ready( function() {
 * <=> Balancer le form sur la page courante avec une variable cachée (voir le form)
 */
 function cas_login() {
-
+    // TODO cas login, wtf?
 	$( "#cas_login_form" ).submit();
 }
 
@@ -50,35 +48,29 @@ function regular_login() {
 		return;
 	}
 
-	/* Envoie des données */
-	$.ajax( {
-		type: "GET",
-		dataType: "json",
-		url: "commun/ajax/login.cible.php",
-		data: { action : "regular_auth", username: username, password: hex_sha1(password) }, 
-		success: function( msg ) {
-
-			if( msg.code == "ok" ) {
-				document.location.reload();
-			}
-			else {
-				$( "#login_form #login_error" ).html( msg.mesg );
-				$( "#login_form #login_error" ).slideDown();
-			}
-			
-		},
-		error: function( obj, ex, msg ) {
-
-			alert( ex + ' - ' + msg + '\n' + obj.responseText );
-		}
-	
-	} );
+	/* Envoi des données */
+    jsRoutes.controllers.StaticPages.login("regular_auth", username, hex_sha1(password)).ajax({
+        success: function( msg ) {
+            if( msg.statut == "ok" ) {
+                document.location = '/';
+            }
+            else {
+                $( "#login_form #login_error" ).html( msg.mesg );
+                $( "#login_form #login_error" ).slideDown();
+            }
+        },
+        error: function( obj, ex, msg ) {
+            // TODO standardiser les messages d'erreur
+            alert( ex + ' - ' + msg + '\n' + obj.responseText );
+        }
+    });
 }
 
 /**
 * Sauvegarde les informations relatives à l'utilisateur courant
 */
 function user_info_save() {
+    // TODO user info save
 
 	var password = $( "#user_info_form #password" ).val();
 	var nom	     = $( "#user_info_form #nom" ).val();

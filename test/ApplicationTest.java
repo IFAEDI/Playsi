@@ -1,6 +1,10 @@
+import controllers.routes;
 import models.Stage;
+import org.codehaus.jackson.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
+import play.libs.Json;
+import play.mvc.Result;
 import services.StageService;
 
 import java.util.List;
@@ -34,11 +38,41 @@ public class ApplicationTest {
         assertThat(StageService.chercherStages(null, null, 3, null, null)).isNotEmpty();
         assertThat(StageService.chercherStages(null, null, null, "Paris", null)).isNotEmpty();
 
-        String[] mots_cles = {"Implémentation", "algo"};
+        String[] mots_cles = {"implémentation", "algo"};
         assertThat(StageService.chercherStages(mots_cles, null, null, null, null)).hasSize(2);
 
         assertThat(StageService.chercherStages(mots_cles, null, null, "Paris", null)).isEmpty();
         assertThat(StageService.chercherStages(mots_cles, null, null, "Lyon", null)).hasSize(1);
     }
 
+    @Test
+    public void testLoginOk() {
+        Result result = callAction(
+                routes.ref.StaticPages.login("regular_auth", "root", "435b41068e8665513a20070c033b08b9c66e4332")
+        );
+        assert( status(result) == 200 );
+        ObjectNode collectedJson = (ObjectNode) Json.parse(contentAsString(result));
+        assertThat( collectedJson.has("statut") );
+        assertThat( collectedJson.get("statut").asText() ).isEqualTo("ok");
+        assertThat( session(result).containsKey("login") );
+        assertThat( session(result).get("login") ).isEqualTo("root");
+    }
+
+    @Test
+    public void testLoginNok() {
+        Result result = callAction(
+                routes.ref.StaticPages.login("regular_auth", "root", "tort")
+                // et le tort tue
+                // et le tue meurt
+                // et le meurt trie
+                // et le tri, c'est Raptor
+                // et le tort tue, etc.
+        );
+
+        assert( status(result) == 200 );
+        ObjectNode collectedJson = (ObjectNode) Json.parse(contentAsString(result));
+        assertThat( collectedJson.has("statut") );
+        assertThat( collectedJson.get("statut").asText() ).isNotEqualTo("ok");
+        assertThat( ! session(result).containsKey("login") );
+    }
 }
