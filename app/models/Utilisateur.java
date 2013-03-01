@@ -1,7 +1,8 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
-import controllers.Utils.Constantes;
+import org.codehaus.jackson.node.ObjectNode;
+import play.libs.Json;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -26,8 +27,17 @@ public class Utilisateur extends Personne {
     private Boolean banni;
 
     public enum TYPE_AUTH {
-        REGULIERE,
-        CAS
+        REGULIERE("Authentification régulière"),
+        CAS("CAS");
+
+        private String intitule = null;
+        TYPE_AUTH(String nom) {
+            this.intitule = nom;
+        }
+
+        public String getIntitule() {
+            return this.intitule;
+        }
     }
 
     public static final String DB_LOGIN = "login";
@@ -36,21 +46,22 @@ public class Utilisateur extends Personne {
     public static final String DB_BANNI = "banni";
 
     public String getRoleString() {
-        String roleStr = null;
-        if( role == Role.ADMIN ) {
-            roleStr = Constantes.ROLE_ADMIN;
-        } else if( role == Role.AEDI ) {
-            roleStr = Constantes.ROLE_AEDI;
-        } else if( role == Role.ENSEIGNANT ) {
-            roleStr = Constantes.ROLE_ENSEIGNANT;
-        } else if( role == Role.ENTREPRISE ) {
-            roleStr = Constantes.ROLE_ENTREPRISE;
-        } else if( role == Role.ETUDIANT ) {
-            roleStr = Constantes.ROLE_ETUDIANT;
-        } else {
-            roleStr = Constantes.ROLE_INCONNU;
-        }
-        return roleStr;
+        return role.getIntitule();
+    }
+
+    public String getAuthServerString() {
+        return auth_service.getIntitule();
+    }
+
+    public ObjectNode toJson() {
+        ObjectNode json = Json.newObject();
+        json.put("login", login);
+        json.put("service", auth_service.ordinal());
+        json.put("type", role.ordinal());
+        json.put("nom", nom);
+        json.put("prenom", prenom);
+        json.put("id", id);
+        return json;
     }
 
     // généré automatiquement

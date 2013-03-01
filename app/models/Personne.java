@@ -22,11 +22,20 @@ public class Personne extends Model {
     }
 
     public enum Role {
-        ETUDIANT,
-        ENSEIGNANT,
-        ENTREPRISE,
-        ADMIN,
-        AEDI
+        ETUDIANT("Etudiant"),
+        ENSEIGNANT("Enseignant"),
+        ENTREPRISE("Entreprise"),
+        ADMIN("Administrateur"),
+        AEDI("Membre de l'AEDI");
+
+        private String intitule = null;
+        Role( String nom ) {
+            this.intitule = nom;
+        }
+
+        public String getIntitule() {
+            return this.intitule;
+        }
     }
 
     @Id
