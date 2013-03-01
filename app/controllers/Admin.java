@@ -119,6 +119,12 @@ public class Admin extends Controller {
         if( ancien == null ) {
             if( nouveau.getId() == Constantes.JSON_ID_UTILISATEUR_INEXISTANT )
             {
+                // vérifier que le login n'est pas déjà pris
+                Utilisateur memeLogin = finder.where().eq(Utilisateur.DB_LOGIN, nouveau.getLogin()).findUnique();
+                if( memeLogin != null ) {
+                    return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Nom d'utilisateur déjà pris."));
+                }
+
                 // Les nouveaux utilisateurs doivent s'authentifier par login / password
                 ancien = new Utilisateur();
                 ancien.setAuth_service(Utilisateur.TYPE_AUTH.REGULIERE);
