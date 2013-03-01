@@ -25,6 +25,7 @@ public class Constantes {
     public static final String JSON_TELEPHONES = "telephones";
     public static final String JSON_NUMERO = "numero";
     public static final String JSON_INTITULE = "intitule";
+    public static final String JSON_PRIORITE = "priorite";
 
     public static final String SESSION_ID = "session_id";
     public static final String SESSION_UTILISATEUR_SUFFIXE = ".utilisateur";

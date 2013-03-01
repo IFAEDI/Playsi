@@ -4,9 +4,12 @@ import com.avaje.ebean.validation.Length;
 import controllers.Utils.Constantes;
 import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
+import play.libs.Json;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,6 +23,9 @@ public class Telephone extends Model {
 
     @Id
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Personne proprietaire;
 
     @Length(max=15)
     private String intitule;
@@ -36,6 +42,14 @@ public class Telephone extends Model {
     public Telephone(ObjectNode json) {
         numero = json.get(Constantes.JSON_NUMERO).asText();
         intitule = json.get(Constantes.JSON_INTITULE).asText();
+    }
+
+    public ObjectNode toJson() {
+        ObjectNode json = Json.newObject();
+        json.put(Constantes.JSON_NUMERO, numero);
+        json.put(Constantes.JSON_INTITULE, intitule);
+        json.put(Constantes.JSON_PRIORITE, priorite);
+        return json;
     }
 
     // Généré par IDE

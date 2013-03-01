@@ -7,8 +7,6 @@ import models.Utilisateur;
 import play.Logger;
 import play.db.ebean.Model;
 
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Benjamin
@@ -61,14 +59,14 @@ public class UtilisateurService {
         }
     }
 
-    public static boolean majUtilisateur(String nom, String prenom, String password, List<Mail> mails, List<Telephone> tels) {
+    public static boolean majUtilisateur(Utilisateur ancien, Utilisateur nouveau) {
         try {
-            Utilisateur utilisateur = SecuriteAPI.utilisateur();
-            utilisateur.setNom(nom);
-            utilisateur.setPrenom(prenom);
+            Utilisateur utilisateur = ancien;
+            utilisateur.setNom(nouveau.getNom());
+            utilisateur.setPrenom(nouveau.getPrenom());
             // met à jour le mot de passe si nécessaire
-            if( utilisateur.getAuth_service() == Utilisateur.TYPE_AUTH.REGULIERE && !password.isEmpty() ) {
-                utilisateur.setPasswd(password);
+            if( utilisateur.getAuth_service() == Utilisateur.TYPE_AUTH.REGULIERE && !nouveau.getPasswd().isEmpty() ) {
+                utilisateur.setPasswd(nouveau.getPasswd());
             }
 
             // Suppression des anciennes valeurs de tels et mails
@@ -80,8 +78,8 @@ public class UtilisateurService {
                 m.delete();
             }
 
-            utilisateur.setMails( mails );
-            utilisateur.setTelephones( tels );
+            utilisateur.setMails( nouveau.getMails() );
+            utilisateur.setTelephones( nouveau.getTelephones() );
             utilisateur.save();
             return true;
         } catch (Exception e) {

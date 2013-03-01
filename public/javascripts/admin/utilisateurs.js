@@ -337,81 +337,71 @@ function editerUtilisateur() {
 		$(this).val( '' );
 	} );
 
-    // TODO récupération information utilisateurs
 	/* On demande au serveur de nous fournir toutes les informations concernant le user */
-	$.ajax( {
-		async: false,
-		type: "GET",
-		dataType: "json",
-		url: "commun/ajax/admin_utilisateurs.cible.php",
-		data : {
-			action: "get_user_info",
-			id    : action_sur
-		},
-                success: function( msg ) {
+	jsRoutes.controllers.Admin.infoUtilisateur(action_sur).ajax( {
+        success: function( msg ) {
 
-                        if( msg.statut == "ok" ) {
+        if( msg.statut == "ok" ) {
 
-				$( "#admin_user_dialog #login" ) .val( msg.utilisateur.login );
-				$( "#admin_user_dialog #nom" )   .val( msg.utilisateur.nom );
-				$( "#admin_user_dialog #prenom" ).val( msg.utilisateur.prenom );
-				$( "#admin_user_dialog #role"   ).val( msg.utilisateur.role );
-				
-				/* Mails */
-				var i = 0;
-				$( "#admin_user_dialog .libelle_mail" ).each( function() {
+        $( "#admin_user_dialog #login" ) .val( msg.utilisateur.login );
+        $( "#admin_user_dialog #nom" )   .val( msg.utilisateur.nom );
+        $( "#admin_user_dialog #prenom" ).val( msg.utilisateur.prenom );
+        $( "#admin_user_dialog #role"   ).val( msg.utilisateur.type );
 
-					if( i < msg.utilisateur.mails.length ) {
-						$(this).val( msg.utilisateur.mails[i][0] );
-						i++;
-					}
-				} );
+        /* Mails */
+        // TODO afficher autant de champs que d'email
+        var i = 0;
+        $( "#admin_user_dialog .libelle_mail" ).each( function() {
 
-				var i = 0;
-				$( "#admin_user_dialog .mail" ).each( function() {
+            if( i < msg.utilisateur.mails.length ) {
+                $(this).val( msg.utilisateur.mails[i].intitule );
+                i++;
+            }
+        } );
 
-					if( i < msg.utilisateur.mails.length ) {
-						$(this).val( msg.utilisateur.mails[i][1] );
-						i++;
-					}
-				} );
+        var i = 0;
+        $( "#admin_user_dialog .mail" ).each( function() {
 
-				/* Téléphones */
-                                var i = 0;
-                                $( "#admin_user_dialog .libelle_telephone" ).each( function() {
+            if( i < msg.utilisateur.mails.length ) {
+                $(this).val( msg.utilisateur.mails[i].email );
+                i++;
+            }
+        });
 
-                                        if( i < msg.utilisateur.telephones.length ) {
-                                                $(this).val( msg.utilisateur.telephones[i][0] );
-                                                i++;
-                                        }
-                                } );
-
-                                var i = 0;
-                                $( "#admin_user_dialog .telephone" ).each( function() {
-
-                                        if( i < msg.utilisateur.telephones.length ) {
-                                                $(this).val( msg.utilisateur.telephones[i][1] );
-                                                i++;
-                                        }
-                                } );
-	
-
-				/* Si jamais il y avait eu des erreurs précédemment, on enlève les class error */
-				$( "#admin_user_dialog #erreur" ).hide();
-				$( "#admin_user_dialog input" ).parents( ".control-group" ).removeClass( "error" );
-				/* On balance le dialog */
-				$( "#admin_user_dialog" ).modal( 'show' );
-                        }
-                        else {
-                                var err = 'Une erreur est survenue lors de la récupération des informations sur l\'utilisateur : ' + msg.code + '/' + msg.mesg;
-                                $( '#admin_utilisateurs #erreur' ).html( err );
-                                $( '#admin_utilisateurs #erreur' ).slideDown();
-                        }
-
-                },
-                error: function( obj, ex, msg ) {
-                        alert( ex + ' - ' + msg + '\n' + obj.responseText );
+        /* Téléphones */
+        // TODO afficher autant de champs que de téléphones
+        var i = 0;
+        $( "#admin_user_dialog .libelle_telephone" ).each( function() {
+                if( i < msg.utilisateur.telephones.length ) {
+                        $(this).val( msg.utilisateur.telephones[i].intitule );
+                        i++;
                 }
+        } );
+
+        var i = 0;
+        $( "#admin_user_dialog .telephone" ).each( function() {
+                if( i < msg.utilisateur.telephones.length ) {
+                        $(this).val( msg.utilisateur.telephones[i].numero );
+                        i++;
+                }
+        } );
+
+        /* Si jamais il y avait eu des erreurs précédemment, on enlève les class error */
+        $( "#admin_user_dialog #erreur" ).hide();
+        $( "#admin_user_dialog input" ).parents( ".control-group" ).removeClass( "error" );
+        /* On balance le dialog */
+        $( "#admin_user_dialog" ).modal( 'show' );
+                }
+                else {
+                        var err = 'Une erreur est survenue lors de la récupération des informations sur l\'utilisateur : ' + msg.code + '/' + msg.mesg;
+                        $( '#admin_utilisateurs #erreur' ).html( err );
+                        $( '#admin_utilisateurs #erreur' ).slideDown();
+                }
+
+        },
+        error: function( obj, ex, msg ) {
+                alert( ex + ' - ' + msg + '\n' + obj.responseText );
+        }
 	} );
 }
 
@@ -461,75 +451,81 @@ function enregistrerUtilisateur() {
 
     // TODO réutiliser /javascripts/login.js
 
-        /* On formatte la liste des mails et leurs libellés */
-        var mails_array = [];
-        var i = 0;
-        $( "#admin_user_dialog .libelle_mail" ).each( function() {
+    /* On formatte la liste des mails et leurs libellés */
+    var mails_array = [];
+    var i = 0;
+    $("#admin_user_dialog .libelle_mail").each(function () {
 
-                mails_array[i] = [$(this).val(), ''];
-                i++;
-        } );
+        mails_array[i++] = {
+            intitule: $(this).val(),
+            email: "",
+            priorite: 0
+        };
+    });
 
-        var i = 0;
-        $( "#admin_user_dialog .mail" ).each( function() {
+    var i = 0;
+    $("#admin_user_dialog .mail").each(function () {
 
-                mails_array[i][1] = $(this).val();
-                i++;
-        } );
+        mails_array[i].email = $(this).val();
+        i++;
+    });
 
-        /* On formatte la liste des téléphones et leurs libellés */
-        var telephones_array = [];
-        var i = 0;
-        $( "#admin_user_dialog .libelle_telephone" ).each( function() {
+    /* On formatte la liste des téléphones et leurs libellés */
+    var telephones_array = [];
+    i = 0;
+    $("#admin_user_dialog .libelle_telephone").each(function () {
 
-                telephones_array[i] = [$(this).val(), ''];
-                i++;
-        } );
+        telephones_array[i++] = {
+            intitule: $(this).val(),
+            numero: "",
+            priorite: 0
+        }
+    });
 
-        var i = 0;
-        $( "#admin_user_dialog .telephone" ).each( function() {
+    var i = 0;
+    $("#admin_user_dialog .telephone").each(function () {
 
-                telephones_array[i][1] = $(this).val();
-                i++;
-        } );
+        telephones_array[i].numero = $(this).val();
+        i++;
+    });
 
-    // TODO modification utilisateur
-	/* Envoi de la requête au serveur */
-	$.ajax( {
-		async: false,
-		type: "POST",
-		dataType: "json",
-		url: "commun/ajax/admin_utilisateurs.cible.php",
-		data: {
-			action    : "edit_user",
-			id        : action_sur,
-			login     : login,
-			pwd       : passwd,
-			nom       : nom,
-			prenom    : prenom,
-			role      : role,
-			mails     : mails_array,
-			telephones: telephones_array
-		},
-                success: function( msg ) {
+    // TODO création / modification utilisateur
+    /* Envoi de la requête au serveur */
+    $.ajax({
+        contentType: "application/json",
+        async: false,
+        type: "POST",
+        dataType: "json",
+        url: "/admin/users",
+        data: JSON.stringify({
+            id: action_sur,
+            login: login,
+            password: passwd,
+            nom: nom,
+            prenom: prenom,
+            role: role,
+            mails: mails_array,
+            telephones: telephones_array
+        }),
+        success: function (msg) {
 
-                        if( msg.statut == "ok" ) {
-				/* Pas très optimisé mais bon..... on refresh la table entière */
-				recupererListeUtilisateurs();
-				$( "#admin_user_dialog" ).modal( 'hide' );
-                        }
-                        else {
-                                var err = 'Une erreur est survenue lors de la mise à jour : ' + msg.code + '/' + msg.mesg;
-                                $( '#admin_user_dialog #erreur' ).html( err );
-                                $( '#admin_user_dialog #erreur' ).slideDown();
-                        }
+            if (msg.statut == "ok") {
+                /* Pas très optimisé mais bon..... on refresh la table entière */
+                recupererListeUtilisateurs();
+                $("#admin_user_dialog").modal('hide');
+            }
+            else {
+                var err = 'Une erreur est survenue lors de la mise à jour : ' + msg.code + '/' + msg.mesg;
+                $('#admin_user_dialog #erreur').html(err);
+                $('#admin_user_dialog #erreur').slideDown();
+            }
 
-                },
-                error: function( obj, ex, msg ) {
-                        alert( ex + ' - ' + msg + '\n' + obj.responseText );
-                }
-	} );	
-}
+        },
+        error: function (obj, ex, msg) {
+            alert(ex + ' - ' + msg + '\n' + obj.responseText);
+        }
+    });
+ }
 
 /**
 * Suppression d'un utilisateur
@@ -552,40 +548,26 @@ function confirmerSuppressionUtilisateur() {
 	var suppr_personne = $( '#admin_del_user_dialog #del_personne:checked' ).val();
 
 	/* On détermine s'il faut supprimer la personne associée */
-	if( void 0 != suppr_personne ) {
-		suppr_personne = 1;
-	}
-	else {
-		suppr_personne = 0;
-	}
+    suppr_personne = ( void 0 != suppr_personne );
 
     // TODO supprimer utilisateur
-	$.ajax( {
-                async: false,
-                type: "GET",
-                dataType: "json",
-                url: "commun/ajax/admin_utilisateurs.cible.php",
-                data: {
-                        action  : "del_user",
-			id	: action_sur,
-			delP	: suppr_personne
-                },
-                success: function( msg ) {
+	jsRoutes.controllers.Admin.supprimerUtilisateur(action_sur, suppr_personne).ajax( {
+        success: function( msg ) {
 
-                        if( msg.statut == "ok" ) {
-				/* Optimisation powa ! (ou pas) */
-				recupererListeUtilisateurs();
-                        }
-                        else {
-                                var err = 'Une erreur est survenue lors de la suppression : ' + msg.code + '/' + msg.mesg;
-                                $( '#admin_utilisateurs #erreur' ).html( err );
-                                $( '#admin_utilisateurs #erreur' ).slideDown();
-                        }
+            if( msg.statut == "ok" ) {
+                /* Optimisation powa ! (ou pas) */
+                recupererListeUtilisateurs();
+            }
+            else {
+                var err = 'Une erreur est survenue lors de la suppression : ' + msg.statut + '/' + msg.mesg;
+                $( '#admin_utilisateurs #erreur' ).html( err );
+                $( '#admin_utilisateurs #erreur' ).slideDown();
+            }
 
-                },
-                error: function( obj, ex, msg ) {
-                        alert( ex + ' - ' + msg + '\n' + obj.responseText );
-                }
+        },
+        error: function( obj, ex, msg ) {
+                alert( ex + ' - ' + msg + '\n' + obj.responseText );
+        }
 	} );
 
 	$( '#admin_del_user_dialog' ).modal( 'hide' );

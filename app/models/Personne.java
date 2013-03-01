@@ -33,6 +33,15 @@ public class Personne extends Model {
             this.intitule = nom;
         }
 
+        public static Role parOrdinal( int ordinal ) {
+            for( Role r : Role.values() ) {
+                if( r.ordinal() == ordinal ) {
+                    return r;
+                }
+            }
+            return null;
+        }
+
         public String getIntitule() {
             return this.intitule;
         }
@@ -47,10 +56,10 @@ public class Personne extends Model {
     @Length(max=35)
     protected String prenom;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "proprietaire")
     protected List<Mail> mails;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "proprietaire")
     protected List<Telephone> telephones;
 
     protected Boolean premiereConnexion;

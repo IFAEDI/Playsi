@@ -19,8 +19,8 @@ GET     /admin/users                controllers.Admin.utilisateurs()
 GET     /admin/users/list           controllers.Admin.listeUtilisateurs()
 GET     /admin/users/labels         controllers.Admin.labelsUtilisateurs()
 GET     /admin/users/:id            controllers.Admin.infoUtilisateur(id: Long)
-POST    /admin/users/               controllers.Admin.modifierUtilisateur()
-POST    /admin/users/:id/delete     controllers.Admin.supprimerUtilisateur(id: Long)
+POST    /admin/users                controllers.Admin.majUtilisateur()
+POST    /admin/users/delete         controllers.Admin.supprimerUtilisateur(id: Long, supprPersonne: Boolean)
 
 # domaine Etudiants
 GET     /etudiants/entretiens       controllers.Etudiants.entretiens()

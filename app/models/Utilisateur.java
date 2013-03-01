@@ -1,6 +1,9 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import controllers.Utils.Constantes;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import play.libs.Json;
 
@@ -53,14 +56,37 @@ public class Utilisateur extends Personne {
         return auth_service.getIntitule();
     }
 
-    public ObjectNode toJson() {
+    public ObjectNode toJsonMinimal() {
         ObjectNode json = Json.newObject();
+        // TODO constantes
         json.put("login", login);
         json.put("service", auth_service.ordinal());
         json.put("type", role.ordinal());
         json.put("nom", nom);
         json.put("prenom", prenom);
         json.put("id", id);
+        return json;
+    }
+
+    /**
+     * Utilisateur au format JSON, avec tous les champs (mails et tels en plus)
+     * @return json minimal + mails[][ intitule, email ] et tels[][ intitule, numero ]
+     */
+    public ObjectNode toJsonFull() {
+        ObjectNode json = toJsonMinimal();
+
+        ArrayNode jMails = new ArrayNode(JsonNodeFactory.instance);
+        for( Mail m : mails ) {
+            jMails.add( m.toJson() );
+        }
+        json.put(Constantes.JSON_MAILS, jMails);
+
+        ArrayNode jTels = new ArrayNode(JsonNodeFactory.instance);
+        for( Telephone t : telephones ) {
+            jTels.add( t.toJson() );
+        }
+        json.put(Constantes.JSON_TELEPHONES, jTels);
+
         return json;
     }
 

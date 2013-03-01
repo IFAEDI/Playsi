@@ -10,6 +10,7 @@ import play.db.ebean.Model;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import services.UtilisateurService;
 import views.html.admin.utilisateurs;
 
 import java.util.List;
@@ -64,13 +65,14 @@ public class Admin extends Controller {
         }
 
         // TODO service
+        // TODO constantes
         Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
         List<Utilisateur> utilisateurs = finder.all();
 
         ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, utilisateurs.size() + " utilisateur(s) trouvés.");
         ArrayNode jsonUtilisateurs = new ArrayNode(JsonNodeFactory.instance);
         for( Utilisateur u: utilisateurs ) {
-            jsonUtilisateurs.add( u.toJson() );
+            jsonUtilisateurs.add( u.toJsonMinimal() );
         }
         json.put("utilisateurs", jsonUtilisateurs);
 
@@ -83,25 +85,82 @@ public class Admin extends Controller {
         if( SecuriteAPI.utilisateur().getRole() != Utilisateur.Role.ADMIN ) {
             return unauthorized();
         }
-        // attendu: msg.statut, msg.utilisateur.{login, nom, prenom, role, mails: [][libellé, email], telephones: [][libellé, email]
-        return ok();
+
+        // TODO service
+        // TODO constantes
+        Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
+        Utilisateur utilisateur = finder.byId(id);
+        if( utilisateur == null ) {
+
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Aucun utilisateur avec cet id trouvé."));
+        }
+
+        ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Utilisateur trouvé.");
+        json.put("utilisateur", utilisateur.toJsonFull() );
+
+        // attendu: msg.statut, msg.utilisateur.{login, nom, prenom, role, mails: [{libellé, email}], telephones: [{libellé, email}]
+        return ok(json);
     }
 
     @Security.Authenticated(SecuriteAPI.class)
-    static public Result modifierUtilisateur() {
+    static public Result majUtilisateur() {
         if( SecuriteAPI.utilisateur().getRole() != Utilisateur.Role.ADMIN ) {
             return unauthorized();
         }
+
+        // TODO service
+        Utilisateur nouveau = StaticPages.parseUtilisateur(true);
+        if( nouveau == null ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Arguments manquants."));
+        }
+
+        Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
+        Utilisateur ancien = finder.byId(nouveau.getId());
+
+        if( ancien == null ) {
+            if( nouveau.getId() == -1 ) // TODO constante!
+            {
+                // Les nouveaux utilisateurs doivent s'authentifier par login / password
+                ancien = new Utilisateur();
+                ancien.setAuth_service(Utilisateur.TYPE_AUTH.REGULIERE);
+            } else {
+                return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Utilisateur non trouvé."));
+            }
+        }
+
+        ancien.setRole( nouveau.getRole() );
+        ancien.setLogin( nouveau.getLogin() );
+
+        if( UtilisateurService.majUtilisateur(ancien, nouveau) ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Modification effectuée"));
+        } else {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Erreur interne. Les administrateurs ont été prévenus."));
+        }
         // attendu: msg.statut
-        return ok();
     }
 
     @Security.Authenticated(SecuriteAPI.class)
-    static public Result supprimerUtilisateur(Long id) {
+    static public Result supprimerUtilisateur(Long id, Boolean supprPersonne) {
         if( SecuriteAPI.utilisateur().getRole() != Utilisateur.Role.ADMIN ) {
             return unauthorized();
         }
+
+        // TODO what if... l'admin se supprime lui-même?
+
+        // TODO service
+        Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
+        Utilisateur utilisateur = finder.byId(id);
+        if( utilisateur == null ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Utilisateur non trouvé."));
+        } else {
+            if(!supprPersonne) {
+                Personne p = utilisateur;
+                p.save(); // TODO vérifier ça!!!!
+            }
+            utilisateur.delete();
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Utilisateur supprimé."));
+        }
+
         // attendu: msg.statut
-        return ok();
     }
 }
