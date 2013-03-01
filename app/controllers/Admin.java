@@ -151,6 +151,7 @@ public class Admin extends Controller {
         }
 
         // TODO what if... l'admin se supprime lui-même?
+        // TODO what if... l'admin supprime le dernier des admins?
 
         // TODO service
         Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
@@ -167,5 +168,21 @@ public class Admin extends Controller {
         }
 
         // attendu: msg.statut
+    }
+
+    public static Result annuaire() {
+        return TODO;
+    }
+
+    public static Result rifs() {
+        return TODO;
+    }
+
+    public static Result simulations() {
+        return TODO;
+    }
+
+    public static Result journal() {
+        return TODO;
     }
 }

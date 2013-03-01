@@ -94,6 +94,32 @@
                             </ul>
                         </li>
 
+                        @if( Securite.estConnecte() && (Securite.utilisateur().getRole().equals(Personne.Role.ADMIN) ||
+                            Securite.utilisateur().getRole().equals(Personne.Role.AEDI)) ) {
+                        <li class="divider-vertical"></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-eye-open icon-white"></i>
+                                    Administration <b class="caret"></b></a>
+
+                            <ul class="dropdown-menu">
+
+                            @if( Securite.utilisateur().getRole().equals(Personne.Role.ADMIN) ) {
+
+                                <li class="nav-header"><i class="icon-user"></i> Utilisateurs</li>
+                                <li><a href="@routes.Admin.utilisateurs()">Utilisateurs</a></li>
+                                <li><a href="@routes.Admin.journal()">Journal</a></li>
+
+                                <li class="divider"></li>
+                            }
+
+                                <li class="nav-header"><i class="icon-cog"></i> Modules</li>
+                                <li><a href="@routes.Admin.annuaire()">Annuaire Entreprises</a></li>
+                                <li><a href="@routes.Admin.rifs()">RIFs</a></li>
+                                <li><a href="@routes.Admin.simulations()">Simulations d'entretiens</a></li>
+                            </ul>
+                        </li>
+                        }
+
                         <!-- TODO add admin sections for AEDI and ADMIN for authentified people (menu.php)
                             -->
 
