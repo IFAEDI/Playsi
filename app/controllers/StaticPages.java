@@ -76,6 +76,8 @@ public class StaticPages extends Controller {
      * Parse l'utilisateur depuis le corps de la requête, sans le sauver en bdd.
      * Factorisé pour être utilisé dans StaticPages.majUtilisateur et Admin.infoUtilisateur
      *
+     * @param entierRequis Faux si seules les infos accessibles pour la modification de son propre profil
+     *                     sont nécessaires, vrai autrement (toutes les infos sauf type_auth sont nécessaires).
      * @return Un utilisateur si tous les arguments minimaux étaient présents, null sinon (ie
      * il manque un argument).
      */
@@ -92,16 +94,16 @@ public class StaticPages extends Controller {
             return null;
         }
 
-        if( entierRequis && (!root.has("id") || !root.has("role") || !root.has("login")) ) {
+        if( entierRequis && (!root.has(Constantes.JSON_ID) || !root.has(Constantes.JSON_ROLE) || !root.has(Constantes.JSON_LOGIN)) ) {
+
             return null;
         }
 
         if( entierRequis ) {
-            u.setId(root.get("id").asLong());
-            u.setRole(Personne.Role.parOrdinal(root.get("role").asInt()));
-            u.setLogin(root.get("login").asText());
+            u.setId(root.get(Constantes.JSON_ID).asLong());
+            u.setRole(Personne.Role.parOrdinal(root.get(Constantes.JSON_ROLE).asInt()));
+            u.setLogin(root.get(Constantes.JSON_LOGIN).asText());
         }
-        // TODO constantes
 
         u.setNom(root.get(Constantes.JSON_NOM).asText());
         u.setPrenom(root.get(Constantes.JSON_PRENOM).asText());

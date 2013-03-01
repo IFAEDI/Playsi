@@ -70,7 +70,6 @@ function recupererListeUtilisateurs() {
 * Envoie une requête AJAX pour récupérer les libellés des services et des types de compte
 */
 function recupererLibelles() {
-        // TODO récupération libellés
         /* Préparation des données à balancer */
         jsRoutes.controllers.Admin.labelsUtilisateurs().ajax({
             success: function( msg ) {
@@ -489,7 +488,6 @@ function enregistrerUtilisateur() {
         i++;
     });
 
-    // TODO création / modification utilisateur
     /* Envoi de la requête au serveur */
     $.ajax({
         contentType: "application/json",
@@ -550,7 +548,6 @@ function confirmerSuppressionUtilisateur() {
 	/* On détermine s'il faut supprimer la personne associée */
     suppr_personne = ( void 0 != suppr_personne );
 
-    // TODO supprimer utilisateur
 	jsRoutes.controllers.Admin.supprimerUtilisateur(action_sur, suppr_personne).ajax( {
         success: function( msg ) {
 

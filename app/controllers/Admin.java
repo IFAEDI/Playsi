@@ -1,5 +1,6 @@
 package controllers;
 
+import controllers.Utils.Constantes;
 import controllers.Utils.JsonUtils;
 import models.Personne;
 import models.Utilisateur;
@@ -65,7 +66,6 @@ public class Admin extends Controller {
         }
 
         // TODO service
-        // TODO constantes
         Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
         List<Utilisateur> utilisateurs = finder.all();
 
@@ -74,7 +74,7 @@ public class Admin extends Controller {
         for( Utilisateur u: utilisateurs ) {
             jsonUtilisateurs.add( u.toJsonMinimal() );
         }
-        json.put("utilisateurs", jsonUtilisateurs);
+        json.put(Constantes.JSON_UTILISATEURS, jsonUtilisateurs);
 
         // attendu: msg.statut, msg.utilisateurs = [{id, login, service, type, nom, prenom}]
         return ok(json);
@@ -87,7 +87,6 @@ public class Admin extends Controller {
         }
 
         // TODO service
-        // TODO constantes
         Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
         Utilisateur utilisateur = finder.byId(id);
         if( utilisateur == null ) {
@@ -96,7 +95,7 @@ public class Admin extends Controller {
         }
 
         ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Utilisateur trouvé.");
-        json.put("utilisateur", utilisateur.toJsonFull() );
+        json.put(Constantes.JSON_UTILISATEUR, utilisateur.toJsonFull() );
 
         // attendu: msg.statut, msg.utilisateur.{login, nom, prenom, role, mails: [{libellé, email}], telephones: [{libellé, email}]
         return ok(json);
@@ -118,7 +117,7 @@ public class Admin extends Controller {
         Utilisateur ancien = finder.byId(nouveau.getId());
 
         if( ancien == null ) {
-            if( nouveau.getId() == -1 ) // TODO constante!
+            if( nouveau.getId() == Constantes.JSON_ID_UTILISATEUR_INEXISTANT )
             {
                 // Les nouveaux utilisateurs doivent s'authentifier par login / password
                 ancien = new Utilisateur();

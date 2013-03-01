@@ -58,13 +58,12 @@ public class Utilisateur extends Personne {
 
     public ObjectNode toJsonMinimal() {
         ObjectNode json = Json.newObject();
-        // TODO constantes
-        json.put("login", login);
-        json.put("service", auth_service.ordinal());
-        json.put("type", role.ordinal());
-        json.put("nom", nom);
-        json.put("prenom", prenom);
-        json.put("id", id);
+        json.put(Constantes.JSON_LOGIN, login);
+        json.put(Constantes.JSON_SERVICE, auth_service.ordinal());
+        json.put(Constantes.JSON_ROLE_ORDINAL, role.ordinal());
+        json.put(Constantes.JSON_NOM, nom);
+        json.put(Constantes.JSON_PRENOM, prenom);
+        json.put(Constantes.JSON_ID, id);
         return json;
     }
 

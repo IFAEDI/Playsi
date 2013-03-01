@@ -26,6 +26,15 @@ public class Constantes {
     public static final String JSON_NUMERO = "numero";
     public static final String JSON_INTITULE = "intitule";
     public static final String JSON_PRIORITE = "priorite";
+    public static final String JSON_UTILISATEURS = "utilisateurs";
+    public static final String JSON_ID = "id";
+    public static final String JSON_ROLE = "role";
+    public static final String JSON_ROLE_ORDINAL = "type";
+    public static final String JSON_LOGIN = "login";
+    public static final String JSON_SERVICE = "service";
+    public static final String JSON_UTILISATEUR = "utilisateur";
+
+    public static final int JSON_ID_UTILISATEUR_INEXISTANT = -1;
 
     public static final String SESSION_ID = "session_id";
     public static final String SESSION_UTILISATEUR_SUFFIXE = ".utilisateur";
