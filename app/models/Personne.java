@@ -14,7 +14,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Personne extends Model {
 
     public Personne() {
@@ -87,5 +87,21 @@ public class Personne extends Model {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public List<Mail> getMails() {
+        return mails;
+    }
+
+    public void setMails(List<Mail> mails) {
+        this.mails = mails;
+    }
+
+    public List<Telephone> getTelephones() {
+        return telephones;
+    }
+
+    public void setTelephones(List<Telephone> telephones) {
+        this.telephones = telephones;
     }
 }

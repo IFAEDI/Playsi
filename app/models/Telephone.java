@@ -1,9 +1,11 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,6 +17,9 @@ import javax.persistence.Entity;
 @Entity
 public class Telephone extends Model {
 
+    @Id
+    private Long id;
+
     @Length(max=15)
     private String intitule;
 
@@ -22,6 +27,15 @@ public class Telephone extends Model {
     private String numero;
 
     private Integer priorite;
+
+    public Telephone() {
+
+    }
+
+    public Telephone(ObjectNode json) {
+        numero = json.get("numero").asText();
+        intitule = json.get("intitule").asText();
+    }
 
     // Généré par IDE
 
