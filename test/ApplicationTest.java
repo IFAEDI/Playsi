@@ -49,7 +49,7 @@ public class ApplicationTest {
     @Test
     public void testLoginOk() {
         Result result = callAction(
-                routes.ref.StaticPages.login(Constantes.JSON_AUTH_REGULIERE, "root", "435b41068e8665513a20070c033b08b9c66e4332")
+                routes.ref.StaticPages.login("root", "435b41068e8665513a20070c033b08b9c66e4332")
         );
         assert( status(result) == 200 );
         ObjectNode collectedJson = (ObjectNode) Json.parse(contentAsString(result));
@@ -62,7 +62,7 @@ public class ApplicationTest {
     @Test
     public void testLoginNok() {
         Result result = callAction(
-                routes.ref.StaticPages.login(Constantes.JSON_AUTH_REGULIERE, "root", "tort")
+                routes.ref.StaticPages.login("root", "tort")
                 // et le tort tue
                 // et le tue meurt
                 // et le meurt trie

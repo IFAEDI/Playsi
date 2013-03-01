@@ -155,7 +155,7 @@
 			<a class="close" data-dismiss="modal" >&times;</a>
 			<h3>Vos informations</h3>
 		</div>
-		<div class="modal-body" style="text-align: center;">
+        <div class="modal-body" style="text-align: center;">
 
 		<form id="user_info_form">
 			<div id="user_info_error" class="alert alert-error hide" style="padding-right: 10px; text-align: justify;" > </div>
@@ -166,72 +166,60 @@
 					<div class="controls">
 					 <input class="input-medium disabled" style="margin: 0px;" id="username" type="text" disabled="disabled" value="@Securite.utilisateur().getLogin()" />
 					</div>
-				  </div>
-                    @if( Securite.utilisateur().getAuth_service().equals( Utilisateur.TYPE_AUTH.REGULIERE ) ) {
-							 <div class="control-group">
-									<label class="control-label" for="password">Mot de passe</label>
-									<div class="controls">
-									<input class="input-medium" style="margin: 0px;" id="password" type="password" />
-									</div>
-							  </div>
-					}
+				 </div>
+                 @if( Securite.utilisateur().getAuth_service().equals( Utilisateur.TYPE_AUTH.REGULIERE ) ) {
+                 <div class="control-group">
+                    <label class="control-label" for="password">Mot de passe</label>
+                    <div class="controls">
+                        <input class="input-medium" style="margin: 0px;" id="password" type="password" />
+                    </div>
+                 </div>
+                 }
 
 				 <div class="control-group">
-					<label class="control-label" for="password">Nom</label>
-					<div class="controls">
-					<input class="input-medium" style="margin: 0px;" id="nom" type="text" value="@Securite.utilisateur().getNom()"/>
-					</div>
-				</div>
-				 <div class="control-group">
+                    <label class="control-label" for="password">Nom</label>
+                    <div class="controls">
+                        <input class="input-medium" style="margin: 0px;" id="nom" type="text" value="@Securite.utilisateur().getNom()"/>
+                    </div>
+				 </div>
+				<div class="control-group">
 					<label class="control-label" for="password">Prénom</label>
 					<div class="controls">
-					<input class="input-medium" style="margin: 0px;" id="prenom" type="text" value="@Securite.utilisateur().getPrenom()" />
+					    <input class="input-medium" style="margin: 0px;" id="prenom" type="text" value="@Securite.utilisateur().getPrenom()" />
 					</div>
 				</div>
-				 <div class="control-group">
+				<div class="control-group">
 					<label class="control-label" for="email">Adresse mail</label>
-						<div class="controls">
-						    <div class="input-prepend">
-                                  <!-- TODO emails
-					<?php
-						$mails = $utilisateur->getPersonne()->getMails();
-					?>
-									<span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_mail" type="text" value="<?=@@$mails[0][0];?>" />
-									<span class="add-on" style="margin-top: -9px;">@@</span><input class="input-medium mail" type="text" value="<?=@@$mails[0][1];?>" />
-							  </div>
-							  <div class="input-prepend">
-									<span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_mail" type="text" value="<?=@@$mails[1][0];?>" />
-									<span class="add-on" style="margin-top: -9px;">@@</span><input class="input-medium mail" type="text" value="<?=@@$mails[1][1];?>" />
-							  </div>
-							  <div class="input-prepend">
-									<span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_mail" type="text" value="<?=@@$mails[2][0];?>" />
-									<span class="add-on" style="margin-top: -9px;">@@</span><input class="input-medium mail" type="text" value="<?=@@$mails[2][1];?>" />
-							  </div>
-                                -->
-							</div>
-                     </div>
+                    <div class="controls">
+                        <div class="input-prepend">
+                            @for( email <- Securite.utilisateur().getMails() ) {
+                            <div class="input-prepend">
+                                <span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_mail" type="text" value="@email.getIntitule()" />
+                                <span class="add-on" style="margin-top: -9px;">@@</span><input class="input-medium mail" type="text" value="@email.getEmail()" />
+                            </div>
+                            }
+                            <div class="input-prepend">
+                                <span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_mail" type="text" value="" />
+                                <span class="add-on" style="margin-top: -9px;">@@</span><input class="input-medium mail" type="text" value="" />
+                            </div>
+                        </div>
+                    </div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="telephone">Téléphone</label>
 					<div class="controls">
 					    <div class="input-prepend">
 						    <div class="input-prepend">
-                                  <!-- TODO telephones
-					<?php
-						$telephones = $utilisateur->getPersonne()->getTelephones();
-					?>
-											<span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_telephone" type="text" value="<?=$telephones[0][0];?>" />
-											<span class="add-on" style="margin-top: -9px;"><i class="icon-volume-up"></i></span><input class="input-medium telephone" type="text" value="<?=$telephones[0][1];?>" />
-									  </div>
-									  <div class="input-prepend">
-											<span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_telephone" type="text" value="<?=$telephones[1][0];?>" />
-											<span class="add-on" style="margin-top: -9px;"><i class="icon-volume-up"></i></span><input class="input-medium telephone" type="text" value="<?=$telephones[1][1];?>" />
-									  </div>
-									  <div class="input-prepend">
-											<span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_telephone" type="text" value="<?=$telephones[2][1];?>" />
-											<span class="add-on" style="margin-top: -9px;"><i class="icon-volume-up"></i></span><input class="input-medium telephone" type="text" value="<?=$telephones[2][2];?>" />
-									  </div>
-                            -->
+                                @for( tel <- Securite.utilisateur().getTelephones() ) {
+                                    <div class="input-prepend">
+                                        <span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_telephone" type="text" value="@tel.getIntitule()" />
+                                        <span class="add-on" style="margin-top: -9px;"><i class="icon-volume-up"></i></span><input class="input-medium telephone" type="text" value="@tel.getNumero()" />
+                                    </div>
+                                }
+                                <div class="input-prepend">
+                                    <span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_telephone" type="text" value="" />
+                                    <span class="add-on" style="margin-top: -9px;"><i class="icon-volume-up"></i></span><input class="input-medium telephone" type="text" value="" />
+                                </div>
                             </div>
 						</div>
 					</div>

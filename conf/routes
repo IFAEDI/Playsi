@@ -6,11 +6,13 @@
 GET     /                           controllers.StaticPages.index()
 GET     /apropos                    controllers.StaticPages.apropos()
 GET     /contact                    controllers.StaticPages.contact()
+GET     /auth                       controllers.StaticPages.authRequise()
 GET     /jsroutes                   controllers.StaticPages.javascriptRoutes()
 
-POST    /login                      controllers.StaticPages.login(action: String, username: String, password: String)
+# api pages statiques
+POST    /login                      controllers.StaticPages.login(username: String, password: String)
+POST    /user                       controllers.StaticPages.majUtilisateur()
 GET     /logout                     controllers.StaticPages.logout()
-GET     /auth                       controllers.StaticPages.authRequise()
 
 # domaine Etudiants
 GET     /etudiants/entretiens       controllers.Etudiants.entretiens()
@@ -18,8 +20,10 @@ GET     /etudiants/stages           controllers.Etudiants.stages()
 GET     /etudiants/cvs              controllers.Etudiants.cvs()
 GET     /etudiants/evenements       controllers.Etudiants.evenements()
 
-POST     /etudiants/api/stages/     controllers.Etudiants.apiStages(mots_cles_str: String, annee: Integer, lieu: String, entreprise: String)
+# api Etudiants
+POST    /etudiants/stages/      controllers.Etudiants.apiStages(mots_cles_str: String, annee: Integer, lieu: String, entreprise: String)
 
+# domaine Entreprises
 GET     /entreprises/rifs           controllers.Entreprises.rifs()
 GET     /entreprises/entretiens     controllers.Entreprises.entretiens_presentation()
 GET     /entreprises/entretiens/inscription     controllers.Entreprises.entretiens_inscription()

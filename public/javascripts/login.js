@@ -49,7 +49,7 @@ function regular_login() {
 	}
 
 	/* Envoi des données */
-    jsRoutes.controllers.StaticPages.login("regular_auth", username, hex_sha1(password)).ajax({
+    jsRoutes.controllers.StaticPages.login(username, hex_sha1(password)).ajax({
         success: function( msg ) {
             if( msg.statut == "ok" ) {
                 document.location = '/';
@@ -70,7 +70,6 @@ function regular_login() {
 * Sauvegarde les informations relatives à l'utilisateur courant
 */
 function user_info_save() {
-    // TODO user info save
 
 	var password = $( "#user_info_form #password" ).val();
 	var nom	     = $( "#user_info_form #nom" ).val();
@@ -88,71 +87,81 @@ function user_info_save() {
 		password = hex_sha1(password);
 	}
 
-	/* On formatte la liste des mails et leurs libellés */
-        var mails_array = [];
-        var i = 0;
-        $( "#user_info_form .libelle_mail" ).each( function() {
+	/* On formate la liste des mails et leurs libellés */
+    var mails_array = [];
+    var i = 0;
+    $( "#user_info_form .libelle_mail" ).each( function() {
 
-                mails_array[i] = [$(this).val(), ''];
-                i++;
-        } );
+            //mails_array[i] = [$(this).val(), ''];
+            // TODO créer prototype mail et prototype telephone
+            mails_array[i] = {
+                intitule: $(this).val(),
+                email: ""
+            };
+            i++;
+    } );
 
-	var i = 0;
+	i = 0;
 	$( "#user_info_form .mail" ).each( function() {
 
-		mails_array[i][1] = $(this).val();
+		//mails_array[i][1] = $(this).val();
+        mails_array[i].email = $(this).val();
 		i++;
 	} );
 
-	/* On formatte la liste des téléphones et leurs libellés */
-        var telephones_array = [];
-        var i = 0;
-        $( "#user_info_form .libelle_telephone" ).each( function() {
+	/* On formate la liste des téléphones et leurs libellés */
+    var telephones_array = [];
+    var i = 0;
+    $( "#user_info_form .libelle_telephone" ).each( function() {
 
-                telephones_array[i] = [$(this).val(), ''];
-                i++;
-        } );
+            //telephones_array[i] = [$(this).val(), ''];
+            telephones_array[i] = {
+                intitule: $(this).val(),
+                numero: ""
+            }
+            i++;
+    } );
 
-        var i = 0;
-        $( "#user_info_form .telephone" ).each( function() {
+    var i = 0;
+    $( "#user_info_form .telephone" ).each( function() {
 
-                telephones_array[i][1] = $(this).val();
-                i++;
-        } );
-
+            //telephones_array[i][1] = $(this).val();
+            telephones_array[i].numero = $(this).val();
+            i++;
+    } );
 
 	/* Préparation des données à balancer */
 	$.ajax( {
-		type: "GET",
-                dataType: "json",
-                url: "commun/ajax/login.cible.php",
-                data: { 
-			action     : "user_info_save",
-			password   : password, 
-			nom        : nom,
-			prenom     : prenom,
-			mails      : mails_array,
-			telephones : telephones_array
-		},
-                success: function( msg ) {
+        contentType: "application/json",
+        type: "POST",
+        dataType: "json",
+        url: "/user",
+        data: JSON.stringify({
+            password   : password,
+            nom        : nom,
+            prenom     : prenom,
+            mails      : mails_array,
+            telephones : telephones_array
+        }),
 
-                        if( msg.code == "ok" ) {
-				$( "#navbar_username" ).html( ' ' + msg.prenom + ' ' + msg.nom );
+        success: function( msg ) {
 
-				$( "#user_info_dialog" ).modal( 'hide' );
-                        }
-                        else {
-				$( "#user_info_form #user_info_error" ).addClass( 'alert-error' );
+            if( msg.statut == "ok" ) {
+                $( "#navbar_username" ).html( ' ' + prenom + ' ' + nom );
+                $( "#user_info_dialog" ).modal( 'hide' );
+                document.location.reload(); // TODO réécrire tous les champs à partir des arguments envoyés?
+            } else {
+                $( "#user_info_form #user_info_error" ).addClass( 'alert-error' );
 
-                                $( "#user_info_form #user_info_error" ).html( msg.mesg );
-                                $( "#user_info_form #user_info_error" ).slideDown();
-                        }
+                $( "#user_info_form #user_info_error" ).html( msg.mesg );
+                $( "#user_info_form #user_info_error" ).slideDown();
+            }
 
-                },
-                error: function( obj, ex, msg ) {
+        },
+        error: function( obj, ex, msg ) {
 
-                        alert( ex + ' - ' + msg + '\n' + obj.responseText );
-                }
+                alert( ex + ' - ' + msg + '\n' + obj.responseText );
+        }
 
 	} );
 }
