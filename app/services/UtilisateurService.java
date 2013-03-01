@@ -1,7 +1,13 @@
 package services;
 
+import controllers.SecuriteAPI;
+import models.Mail;
+import models.Telephone;
 import models.Utilisateur;
+import play.Logger;
 import play.db.ebean.Model;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,6 +21,7 @@ public class UtilisateurService {
     public enum Statut {
         VARIABLES_MANQUANTES,
         IDENTIFIANTS_INVALIDES,
+        ERREUR_INTERNE,
         OK
     }
 
@@ -26,23 +33,61 @@ public class UtilisateurService {
     }
 
     public static LoginResult loginRegulier(String username, String password) {
-        LoginResult resultat = new LoginResult();
-        if( username.isEmpty() || password.isEmpty() ) {
-            resultat.statut = Statut.VARIABLES_MANQUANTES;
-        } else {
-            Utilisateur utilisateur =
-                finder.where().eq(Utilisateur.DB_LOGIN, username)
-                        .eq(Utilisateur.DB_PASSWORD, password)
-                        .eq(Utilisateur.DB_AUTH_SERVICE, Utilisateur.TYPE_AUTH.REGULIERE)
-                        .findUnique();
 
-            if( utilisateur != null ) {
-                resultat.statut = Statut.OK;
-                resultat.utilisateur = utilisateur;
+        LoginResult resultat = new LoginResult();
+        try {
+            if( username.isEmpty() || password.isEmpty() ) {
+                resultat.statut = Statut.VARIABLES_MANQUANTES;
             } else {
-                resultat.statut = Statut.IDENTIFIANTS_INVALIDES;
+                Utilisateur utilisateur =
+                    finder.where().eq(Utilisateur.DB_LOGIN, username)
+                            .eq(Utilisateur.DB_PASSWORD, password)
+                            .eq(Utilisateur.DB_AUTH_SERVICE, Utilisateur.TYPE_AUTH.REGULIERE)
+                            .findUnique();
+
+                if( utilisateur != null ) {
+                    resultat.statut = Statut.OK;
+                    resultat.utilisateur = utilisateur;
+                } else {
+                    resultat.statut = Statut.IDENTIFIANTS_INVALIDES;
+                }
             }
+        } catch( Exception e ) {
+            Logger.error("Erreur lors de la récupération d'un utilisateur par auth normale. Login = " + username + " / Password = " + password);
+            Logger.error( e.getMessage() );
+            resultat.statut = Statut.ERREUR_INTERNE;
+        } finally {
+            return resultat;
         }
-        return resultat;
+    }
+
+    public static boolean majUtilisateur(String nom, String prenom, String password, List<Mail> mails, List<Telephone> tels) {
+        try {
+            Utilisateur utilisateur = SecuriteAPI.utilisateur();
+            utilisateur.setNom(nom);
+            utilisateur.setPrenom(prenom);
+            // met à jour le mot de passe si nécessaire
+            if( utilisateur.getAuth_service() == Utilisateur.TYPE_AUTH.REGULIERE && !password.isEmpty() ) {
+                utilisateur.setPasswd(password);
+            }
+
+            // Suppression des anciennes valeurs de tels et mails
+            // TODO y a peut-être mieux? (trier téléphones actuels, trier téléphones du json, faire une comparaison 1 à 1)
+            for( Telephone t : utilisateur.getTelephones() ) {
+                t.delete();
+            }
+            for( Mail m: utilisateur.getMails() ) {
+                m.delete();
+            }
+
+            utilisateur.setMails( mails );
+            utilisateur.setTelephones( tels );
+            utilisateur.save();
+            return true;
+        } catch (Exception e) {
+            Logger.error("Erreur lors de la mise à jour d'un utilisateur. Utilisateur id = " + SecuriteAPI.utilisateur().getId());
+            Logger.error( e.getMessage() );
+            return false;
+        }
     }
 }

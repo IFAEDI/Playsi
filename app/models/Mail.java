@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import controllers.Utils.Constantes;
 import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
 
@@ -33,8 +34,8 @@ public class Mail extends Model {
     }
 
     public Mail( ObjectNode json ) {
-        this.email = json.get("email").asText();
-        this.intitule = json.get("intitule").asText();
+        this.email = json.get(Constantes.JSON_EMAIL).asText();
+        this.intitule = json.get(Constantes.JSON_INTITULE).asText();
     }
 
     // générés par l'IDE

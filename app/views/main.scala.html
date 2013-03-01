@@ -192,6 +192,7 @@
 					<label class="control-label" for="email">Adresse mail</label>
                     <div class="controls">
                         <div class="input-prepend">
+                            <!-- TODO ajouter bouton "ajouter un email" -->
                             @for( email <- Securite.utilisateur().getMails() ) {
                             <div class="input-prepend">
                                 <span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_mail" type="text" value="@email.getIntitule()" />
@@ -210,6 +211,7 @@
 					<div class="controls">
 					    <div class="input-prepend">
 						    <div class="input-prepend">
+                                <!-- TODO ajouter bouton "ajouter un téléphone" -->
                                 @for( tel <- Securite.utilisateur().getTelephones() ) {
                                     <div class="input-prepend">
                                         <span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_telephone" type="text" value="@tel.getIntitule()" />

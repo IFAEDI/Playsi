@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import controllers.Utils.Constantes;
 import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
 
@@ -33,8 +34,8 @@ public class Telephone extends Model {
     }
 
     public Telephone(ObjectNode json) {
-        numero = json.get("numero").asText();
-        intitule = json.get("intitule").asText();
+        numero = json.get(Constantes.JSON_NUMERO).asText();
+        intitule = json.get(Constantes.JSON_INTITULE).asText();
     }
 
     // Généré par IDE
