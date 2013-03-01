@@ -33,11 +33,25 @@ public class Etudiants extends Controller {
 
     @Security.Authenticated(Securite.class)
     public static Result stages() {
+        // rôles pour lesquels l'utilisation de la page stages est interdite
+        switch (SecuriteAPI.utilisateur().getRole() ) {
+            case ENSEIGNANT:
+            case ENTREPRISE:
+                return unauthorized(); // TODO page indiquant que l'accès n'est pas autorisé, plutôt?
+        }
+
         return ok(stages.render());
     }
 
     @Security.Authenticated(SecuriteAPI.class)
     public static Result apiStages(String mots_cles_str, Integer annee, String lieu, String entreprise) {
+
+        // rôles pour lesquels l'utilisation de l'API de stages est interdite
+        switch (SecuriteAPI.utilisateur().getRole() ) {
+            case ENSEIGNANT:
+            case ENTREPRISE:
+                return unauthorized();
+        }
 
         String[] mots_cles = null;
         if( !mots_cles_str.isEmpty() ) {
