@@ -14,6 +14,14 @@ POST    /login                      controllers.StaticPages.login(username: Stri
 POST    /user                       controllers.StaticPages.majUtilisateur()
 GET     /logout                     controllers.StaticPages.logout()
 
+# Modules privés
+GET     /admin/users                controllers.Admin.utilisateurs()
+GET     /admin/users/list           controllers.Admin.listeUtilisateurs()
+GET     /admin/users/labels         controllers.Admin.labelsUtilisateurs()
+GET     /admin/users/:id            controllers.Admin.infoUtilisateur(id: Long)
+POST    /admin/users/               controllers.Admin.modifierUtilisateur()
+POST    /admin/users/:id/delete     controllers.Admin.supprimerUtilisateur(id: Long)
+
 # domaine Etudiants
 GET     /etudiants/entretiens       controllers.Etudiants.entretiens()
 GET     /etudiants/stages           controllers.Etudiants.stages()
@@ -21,7 +29,7 @@ GET     /etudiants/cvs              controllers.Etudiants.cvs()
 GET     /etudiants/evenements       controllers.Etudiants.evenements()
 
 # api Etudiants
-POST    /etudiants/stages/      controllers.Etudiants.apiStages(mots_cles_str: String, annee: Integer, lieu: String, entreprise: String)
+POST    /etudiants/stages/          controllers.Etudiants.apiStages(mots_cles_str: String, annee: Integer, lieu: String, entreprise: String)
 
 # domaine Entreprises
 GET     /entreprises/rifs           controllers.Entreprises.rifs()

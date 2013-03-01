@@ -4,7 +4,6 @@ import controllers.Utils.Constantes;
 import controllers.Utils.JsonUtils;
 import models.Mail;
 import models.Telephone;
-import models.Utilisateur;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -64,32 +63,34 @@ public class StaticPages extends Controller {
         } else if( loginResult.statut == UtilisateurService.Statut.IDENTIFIANTS_INVALIDES ) {
 
             return ok( JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Identifiants non valides"));
+        } else if( loginResult.statut == UtilisateurService.Statut.ERREUR_INTERNE ) {
+
+            return ok( JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Erreur interne du serveur. Les administrateurs ont été prévenus."));
         }
         return badRequest();
     }
 
     @Security.Authenticated(SecuriteAPI.class)
     public static Result majUtilisateur() {
-        // TODO service
-        // TODO constantiser tous les noms
 
+        // récupération des arguments par body parsing
         JsonNode root = request().body().asJson();
 
         JsonNode reponseBadRequest = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Arguments manquants");
-        if( !root.has("nom") || !root.has("prenom") || !root.has("password")
-                || !root.has("mails") || !root.has("telephones")) {
+        if( !root.has(Constantes.JSON_NOM) || !root.has(Constantes.JSON_PRENOM) || !root.has(Constantes.JSON_PASSWORD)
+                || !root.has(Constantes.JSON_MAILS) || !root.has(Constantes.JSON_TELEPHONES)) {
             return badRequest(reponseBadRequest);
         }
 
-        String nom = root.get("nom").asText();
-        String prenom = root.get("prenom").asText();
-        String password = root.get("password").asText();
+        String nom = root.get(Constantes.JSON_NOM).asText();
+        String prenom = root.get(Constantes.JSON_PRENOM).asText();
+        String password = root.get(Constantes.JSON_PASSWORD).asText();
 
         List<Mail> mails = new ArrayList<Mail>();
         // Reconstruction des emails: récupérer
-        for( JsonNode jn : (ArrayNode) root.get("mails") ) {
+        for( JsonNode jn : (ArrayNode) root.get(Constantes.JSON_MAILS) ) {
             ObjectNode on = (ObjectNode) jn;
-            if( !on.has("email") ) {
+            if( !on.has(Constantes.JSON_EMAIL) ) {
                 // un objet "email" en json doit avoir au moins la clé "email"
                 return badRequest(reponseBadRequest);
             }
@@ -101,9 +102,9 @@ public class StaticPages extends Controller {
 
         // idem que reconstruction emails
         List<Telephone> tels = new ArrayList<Telephone>();
-        for( JsonNode jn : (ArrayNode) root.get("telephones") ) {
+        for( JsonNode jn : (ArrayNode) root.get(Constantes.JSON_TELEPHONES) ) {
             ObjectNode on = (ObjectNode) jn;
-            if( !on.has("numero") ) {
+            if( !on.has(Constantes.JSON_NUMERO) ) {
                 return badRequest(reponseBadRequest);
             }
             Telephone t = new Telephone(on);
@@ -111,38 +112,24 @@ public class StaticPages extends Controller {
                 tels.add(t);
         }
 
-        Utilisateur utilisateur = SecuriteAPI.utilisateur();
-        utilisateur.setNom(nom);
-        utilisateur.setPrenom(prenom);
-        // met à jour le mot de passe si nécessaire
-        if( !password.isEmpty() ) {
-            utilisateur.setPasswd(password);
+        if( UtilisateurService.majUtilisateur(nom, prenom, password, mails, tels) ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Mise à jour réussie."));
+        } else {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Erreur interne lors de la mise à jour du profil."));
         }
 
-        // Suppression des anciennes valeurs de tels et mails
-        // TODO y a peut-être mieux? (trier téléphones actuels, trier téléphones du json, faire une comparaison 1 à 1)
-
-        for( Telephone t : utilisateur.getTelephones() ) {
-            t.delete();
-        }
-        for( Mail m: utilisateur.getMails() ) {
-            m.delete();
-        }
-
-        utilisateur.setMails( mails );
-        utilisateur.setTelephones( tels );
-        utilisateur.save();
-
-        return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Mise à jour réussie."));
     }
 
     public static Result javascriptRoutes() {
         response().setContentType("text/javascript");
         return ok(
                 Routes.javascriptRouter("jsRoutes",
+                        // login
                         routes.javascript.Etudiants.apiStages(),
                         routes.javascript.StaticPages.login(),
-                        routes.javascript.StaticPages.majUtilisateur()
+                        // admin: utilisateurs
+                        routes.javascript.Admin.listeUtilisateurs(),
+                        routes.javascript.Admin.labelsUtilisateurs()
                 )
         );
     }

@@ -1,6 +1,6 @@
 /**************************************************
-* Author : Sébastien Mériot			  *
-* Date : 30.03.2012				  *
+* Author : Sébastien                              *
+* Date : 30.03.2012				                  *
 * Description : Gestion des utilisateurs en base  *
 **************************************************/
 
@@ -28,12 +28,12 @@ $(document).ready( function() {
 	$( "#admin_utilisateurs #filter_type" ).click( filtrer_type );
 	$( "#admin_utilisateurs #no_filter_type" ).click( supprime_filtre_type );
 
-	$( "#admin_utilisateurs #raffraichir" ).click( recupererListeUtilisateurs );
+	$( "#admin_utilisateurs #rafraichir" ).click( recupererListeUtilisateurs );
 	$( "#admin_utilisateurs #ajouter" ).click( ajouterUtilisateur );
 
 	$( "#admin_user_dialog #enregistrer" ).click( enregistrerUtilisateur );
 	$( "#admin_del_user_dialog #confirmer" ).click( confirmerSuppressionUtilisateur );
-	
+
 	
 } );
 
@@ -42,77 +42,65 @@ $(document).ready( function() {
 * Envoie une requête AJAX pour récupérer tous les utilisateurs enregistrés
 */
 function recupererListeUtilisateurs() {
-
 	/* Préparation des données à balancer */
-	$.ajax( {
-		type: "GET",
-                dataType: "json",
-                url: "commun/ajax/admin_utilisateurs.cible.php",
-                data: { 
-			action  : "get_user_list"
-		},
-                success: function( msg ) {
+    jsRoutes.controllers.Admin.listeUtilisateurs().ajax({
+        success: function( msg ) {
 
-                        if( msg.code == "ok" ) {
-				/* Conservation de la liste en mémoire et on actualise la table */
-				liste_utilisateurs = clone(msg.utilisateurs);
-				raffraichirTable();
-                        }
-                        else {
-				var err = 'Une erreur est survenue lors de la récupération des utilisateurs : ' + msg.mesg; 
-				$( '#admin_utilisateurs #erreur' ).html( err );
-				$( '#admin_utilisateurs #erreur' ).slideDown();
-                        }
+            if( msg.statut == "ok" ) {
+                // Conservation de la liste en mémoire et on actualise la table
+                liste_utilisateurs = clone(msg.utilisateurs);
+                rafraichirTable();
+            }
+            else {
+                var err = 'Une erreur est survenue lors de la récupération des utilisateurs : ' + msg.mesg;
+                $( '#admin_utilisateurs #erreur' ).html( err );
+                $( '#admin_utilisateurs #erreur' ).slideDown();
+            }
 
-                },
-                error: function( obj, ex, msg ) {
-                        alert( ex + ' - ' + msg + '\n' + obj.responseText );
-                }
-	} );
+        },
+        error: function( obj, ex, msg ) {
+            alert( ex + ' - ' + msg + '\n' + obj.responseText );
+        }
+    });
 }
+
+// TODO renommer "types" en "roles"
 
 /**
 * Envoie une requête AJAX pour récupérer les libellés des services et des types de compte
 */
 function recupererLibelles() {
-
+        // TODO récupération libellés
         /* Préparation des données à balancer */
-        $.ajax( {
-		async: false,
-                type: "GET",
-                dataType: "json",
-                url: "commun/ajax/admin_utilisateurs.cible.php",
-                data: {
-                        action  : "get_labels"
-                },
-                success: function( msg ) {
+        jsRoutes.controllers.Admin.labelsUtilisateurs().ajax({
+            success: function( msg ) {
 
-                        if( msg.code == "ok" ) {
-				/* Conservation des informations en mémoire */
-                                liste_services = clone(msg.services);
-                                liste_types    = clone(msg.types);
-				/* Actualisation des filtres */
-				raffraichirEnTete();
-				/* Actualisation du combo dans la dialog d'ajout/edition */
-				raffraichirListeRoles();
-                        }
-                        else {
-                                var err = 'Une erreur est survenue lors de la récupération des libellés : ' + msg.mesg;  
-                                $( '#admin_utilisateurs #erreur' ).html( err );
-                                $( '#admin_utilisateurs #erreur' ).slideDown();
-                        }
-
-                },
-                error: function( obj, ex, msg ) {
-                        alert( ex + ' - ' + msg + '\n' + obj.responseText );
+                if( msg.statut == "ok" ) {
+                    // Conservation des informations en mémoire /
+                    liste_services = clone(msg.services);
+                    liste_types    = clone(msg.roles);
+                    // Actualisation des filtres /
+                    rafraichirEnTete();
+                    // Actualisation du combo dans la dialog d'ajout/edition /
+                    rafraichirListeRoles();
                 }
-        } );
+                else {
+                    var err = 'Une erreur est survenue lors de la récupération des libellés : ' + msg.mesg;
+                    $( '#admin_utilisateurs #erreur' ).html( err );
+                    $( '#admin_utilisateurs #erreur' ).slideDown();
+                }
+
+            },
+            error: function( obj, ex, msg ) {
+                alert( ex + ' - ' + msg + '\n' + obj.responseText );
+            }
+        });
 }  
 
 /**
-* Raffraichit les en-têtes des colonnes pour afficher les filtres
+* Rafraichit les en-têtes des colonnes pour afficher les filtres
 */
-function raffraichirEnTete() {
+function rafraichirEnTete() {
 
 	/* Filtre pour les services d'authentification */
 	var services = '<li><a id="no_filter_service">Tous</a></li>';
@@ -141,9 +129,9 @@ function raffraichirEnTete() {
 }
 
 /**
-* Raffraichit la liste des rôles
+* Rafraichit la liste des rôles
 */
-function raffraichirListeRoles() {
+function rafraichirListeRoles() {
 	
 	var options = '';
 	var i = 0;
@@ -161,9 +149,9 @@ function raffraichirListeRoles() {
 /**
 * Actualise le contenu de la table
 */
-function raffraichirTable() {
+function rafraichirTable() {
 
-	raffraichirPages();
+	rafraichirPages();
 
 	var tbody = '';
 	var i = 0;
@@ -245,9 +233,9 @@ function raffraichirTable() {
 }
 
 /**
-* Raffraichit les numéros de page
+* Rafraichit les numéros de page
 */
-function raffraichirPages() {
+function rafraichirPages() {
 
 	/* On vide les pages */
 	$( '#admin_utilisateurs .pagination ul' ).html( '' );
@@ -282,7 +270,7 @@ function raffraichirPages() {
 function changerPage() {
 
 	page_courante = $(this).html();
-	raffraichirTable();
+	rafraichirTable();
 }
 
 /**
@@ -291,13 +279,13 @@ function changerPage() {
 function filtrer_service() {
 
 	filtre_service = $(this).html();
-	raffraichirTable( 0 );
+	rafraichirTable( 0 );
 }
 
 function supprime_filtre_service() {
 
 	filtre_service = '';
-	raffraichirTable( 0 );
+	rafraichirTable( 0 );
 }
 
 /**
@@ -306,13 +294,13 @@ function supprime_filtre_service() {
 function filtrer_type() {
 
 	filtre_type = $(this).html();
-	raffraichirTable( 0 );
+	rafraichirTable( 0 );
 }
 
 function supprime_filtre_type() {
 
 	filtre_type = '';
-	raffraichirTable( 0 );
+	rafraichirTable( 0 );
 }
 
 /**
@@ -349,6 +337,7 @@ function editerUtilisateur() {
 		$(this).val( '' );
 	} );
 
+    // TODO récupération information utilisateurs
 	/* On demande au serveur de nous fournir toutes les informations concernant le user */
 	$.ajax( {
 		async: false,
@@ -361,7 +350,7 @@ function editerUtilisateur() {
 		},
                 success: function( msg ) {
 
-                        if( msg.code == "ok" ) {
+                        if( msg.statut == "ok" ) {
 
 				$( "#admin_user_dialog #login" ) .val( msg.utilisateur.login );
 				$( "#admin_user_dialog #nom" )   .val( msg.utilisateur.nom );
@@ -470,6 +459,8 @@ function enregistrerUtilisateur() {
 		passwd = hex_sha1( passwd );
 	}
 
+    // TODO réutiliser /javascripts/login.js
+
         /* On formatte la liste des mails et leurs libellés */
         var mails_array = [];
         var i = 0;
@@ -502,10 +493,11 @@ function enregistrerUtilisateur() {
                 i++;
         } );
 
-	/* Envoie de la requête au serveur */
+    // TODO modification utilisateur
+	/* Envoi de la requête au serveur */
 	$.ajax( {
 		async: false,
-		type: "GET",
+		type: "POST",
 		dataType: "json",
 		url: "commun/ajax/admin_utilisateurs.cible.php",
 		data: {
@@ -521,7 +513,7 @@ function enregistrerUtilisateur() {
 		},
                 success: function( msg ) {
 
-                        if( msg.code == "ok" ) {
+                        if( msg.statut == "ok" ) {
 				/* Pas très optimisé mais bon..... on refresh la table entière */
 				recupererListeUtilisateurs();
 				$( "#admin_user_dialog" ).modal( 'hide' );
@@ -567,7 +559,7 @@ function confirmerSuppressionUtilisateur() {
 		suppr_personne = 0;
 	}
 
-
+    // TODO supprimer utilisateur
 	$.ajax( {
                 async: false,
                 type: "GET",
@@ -580,7 +572,7 @@ function confirmerSuppressionUtilisateur() {
                 },
                 success: function( msg ) {
 
-                        if( msg.code == "ok" ) {
+                        if( msg.statut == "ok" ) {
 				/* Optimisation powa ! (ou pas) */
 				recupererListeUtilisateurs();
                         }
