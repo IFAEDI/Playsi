@@ -2,10 +2,14 @@ package services;
 
 import controllers.SecuriteAPI;
 import models.Mail;
+import models.Personne;
 import models.Telephone;
 import models.Utilisateur;
 import play.Logger;
 import play.db.ebean.Model;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +23,8 @@ public class UtilisateurService {
     public enum Statut {
         VARIABLES_MANQUANTES,
         IDENTIFIANTS_INVALIDES,
+        UTILISATEUR_NON_TROUVE,
+        LOGIN_DEJA_PRIS,
         ERREUR_INTERNE,
         OK
     }
@@ -86,6 +92,87 @@ public class UtilisateurService {
             Logger.error("Erreur lors de la mise à jour d'un utilisateur. Utilisateur id = " + SecuriteAPI.utilisateur().getId());
             Logger.error( e.getMessage() );
             return false;
+        }
+    }
+
+    public static class LabelsResult {
+        public List<String> types_auth = new ArrayList<String>();
+        public List<String> roles = new ArrayList<String>();
+    }
+
+    public static LabelsResult getLabels() {
+        LabelsResult labelsResult = new LabelsResult();
+        for( Utilisateur.TYPE_AUTH t: Utilisateur.TYPE_AUTH.values() ) {
+            labelsResult.types_auth.add( t.getIntitule() );
+        }
+        for( Personne.Role r: Personne.Role.values() ) {
+            labelsResult.roles.add( r.getIntitule() );
+        }
+        return labelsResult;
+    }
+
+    public static List<Utilisateur> utilisateurs() {
+        return finder.all();
+    }
+
+    public static class InfoUtilisateurResult {
+        public Utilisateur utilisateur;
+        public Statut statut;
+    }
+
+    public static InfoUtilisateurResult infoUtilisateur(Long id) {
+        InfoUtilisateurResult result = new InfoUtilisateurResult();
+        result.utilisateur = finder.byId(id);
+        if( result.utilisateur == null ) {
+            result.statut = Statut.UTILISATEUR_NON_TROUVE;
+        } else {
+            result.statut = Statut.OK;
+        }
+        return result;
+    }
+
+    public static Statut adminMajUtilisateur(Utilisateur nouveau, boolean estNouvelUtilisateur) {
+        Utilisateur ancien = finder.byId(nouveau.getId());
+        if( ancien == null ) {
+            if( !estNouvelUtilisateur ) {
+                return Statut.UTILISATEUR_NON_TROUVE;
+            } else {
+                Utilisateur memeLogin = finder.where().eq(Utilisateur.DB_LOGIN, nouveau.getLogin()).findUnique();
+                if( memeLogin != null ) {
+                    return Statut.LOGIN_DEJA_PRIS;
+                }
+
+                // Les nouveaux utilisateurs doivent s'authentifier par login / password
+                ancien = new Utilisateur();
+                ancien.setAuth_service(Utilisateur.TYPE_AUTH.REGULIERE);
+            }
+        }
+
+        ancien.setRole( nouveau.getRole() );
+        ancien.setLogin( nouveau.getLogin() );
+
+        if( majUtilisateur(ancien, nouveau) ) {
+            return Statut.OK;
+        } else {
+            return Statut.ERREUR_INTERNE;
+        }
+    }
+
+    public static Statut supprimerUtilisateur(Long id, boolean supprimerPersonne) {
+
+        // TODO what if... l'admin se supprime lui-même?
+        // TODO what if... l'admin supprime le dernier des admins?
+
+        Utilisateur utilisateur = finder.byId(id);
+        if( utilisateur == null ) {
+            return Statut.UTILISATEUR_NON_TROUVE;
+        } else {
+            if(!supprimerPersonne) {
+                Personne p = utilisateur;
+                p.save(); // TODO vérifier ça!!!!
+            }
+            utilisateur.delete();
+            return Statut.OK;
         }
     }
 }

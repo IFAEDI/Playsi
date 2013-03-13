@@ -2,12 +2,11 @@ package controllers;
 
 import controllers.Utils.Constantes;
 import controllers.Utils.JsonUtils;
-import models.Personne;
 import models.Utilisateur;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
-import play.db.ebean.Model;
+import play.Logger;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -41,15 +40,15 @@ public class Admin extends Controller {
 
         ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Récupération des labels effectuée");
 
-        // TODO service?
+        UtilisateurService.LabelsResult labelsResult = UtilisateurService.getLabels();
         ArrayNode auth = new ArrayNode(JsonNodeFactory.instance);
-        for( Utilisateur.TYPE_AUTH t: Utilisateur.TYPE_AUTH.values() ) {
-            auth.add( t.getIntitule() );
+        for( String s: labelsResult.types_auth ) {
+            auth.add( s );
         }
 
         ArrayNode roles = new ArrayNode(JsonNodeFactory.instance);
-        for(Personne.Role r: Personne.Role.values()) {
-            roles.add( r.getIntitule() );
+        for( String s: labelsResult.roles) {
+            roles.add( s );
         }
 
         json.put("services", auth);
@@ -65,10 +64,7 @@ public class Admin extends Controller {
             return unauthorized();
         }
 
-        // TODO service
-        Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
-        List<Utilisateur> utilisateurs = finder.all();
-
+        List<Utilisateur> utilisateurs = UtilisateurService.utilisateurs();
         ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, utilisateurs.size() + " utilisateur(s) trouvés.");
         ArrayNode jsonUtilisateurs = new ArrayNode(JsonNodeFactory.instance);
         for( Utilisateur u: utilisateurs ) {
@@ -86,16 +82,13 @@ public class Admin extends Controller {
             return unauthorized();
         }
 
-        // TODO service
-        Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
-        Utilisateur utilisateur = finder.byId(id);
-        if( utilisateur == null ) {
-
+        UtilisateurService.InfoUtilisateurResult result = UtilisateurService.infoUtilisateur(id);
+        if( result.statut == UtilisateurService.Statut.UTILISATEUR_NON_TROUVE ) {
             return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Aucun utilisateur avec cet id trouvé."));
         }
 
         ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Utilisateur trouvé.");
-        json.put(Constantes.JSON_UTILISATEUR, utilisateur.toJsonFull() );
+        json.put(Constantes.JSON_UTILISATEUR, result.utilisateur.toJsonFull() );
 
         // attendu: msg.statut, msg.utilisateur.{login, nom, prenom, role, mails: [{libellé, email}], telephones: [{libellé, email}]
         return ok(json);
@@ -107,38 +100,22 @@ public class Admin extends Controller {
             return unauthorized();
         }
 
-        // TODO service
         Utilisateur nouveau = StaticPages.parseUtilisateur(true);
         if( nouveau == null ) {
             return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Arguments manquants."));
         }
 
-        Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
-        Utilisateur ancien = finder.byId(nouveau.getId());
-
-        if( ancien == null ) {
-            if( nouveau.getId() == Constantes.JSON_ID_UTILISATEUR_INEXISTANT )
-            {
-                // vérifier que le login n'est pas déjà pris
-                Utilisateur memeLogin = finder.where().eq(Utilisateur.DB_LOGIN, nouveau.getLogin()).findUnique();
-                if( memeLogin != null ) {
-                    return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Nom d'utilisateur déjà pris."));
-                }
-
-                // Les nouveaux utilisateurs doivent s'authentifier par login / password
-                ancien = new Utilisateur();
-                ancien.setAuth_service(Utilisateur.TYPE_AUTH.REGULIERE);
-            } else {
-                return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Utilisateur non trouvé."));
-            }
-        }
-
-        ancien.setRole( nouveau.getRole() );
-        ancien.setLogin( nouveau.getLogin() );
-
-        if( UtilisateurService.majUtilisateur(ancien, nouveau) ) {
+        UtilisateurService.Statut statut = UtilisateurService.adminMajUtilisateur(nouveau, nouveau.getId() == Constantes.JSON_ID_UTILISATEUR_INEXISTANT);
+        if( statut == UtilisateurService.Statut.UTILISATEUR_NON_TROUVE ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Utilisateur non trouvé."));
+        } else if( statut == UtilisateurService.Statut.LOGIN_DEJA_PRIS ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Nom d'utilisateur déjà pris."));
+        } else if( statut == UtilisateurService.Statut.ERREUR_INTERNE ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Erreur interne. Les administrateurs ont été prévenus."));
+        } else if( statut == UtilisateurService.Statut.OK ) {
             return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Modification effectuée"));
         } else {
+            Logger.error("Controllers/Admin - majUtilisateur - statut inconnu: " + statut.name());
             return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Erreur interne. Les administrateurs ont été prévenus."));
         }
         // attendu: msg.statut
@@ -150,23 +127,15 @@ public class Admin extends Controller {
             return unauthorized();
         }
 
-        // TODO what if... l'admin se supprime lui-même?
-        // TODO what if... l'admin supprime le dernier des admins?
-
-        // TODO service
-        Model.Finder<Long, Utilisateur> finder = new Model.Finder<Long, Utilisateur>(Long.class, Utilisateur.class);
-        Utilisateur utilisateur = finder.byId(id);
-        if( utilisateur == null ) {
+        UtilisateurService.Statut statut = UtilisateurService.supprimerUtilisateur(id, supprPersonne);
+        if( statut == UtilisateurService.Statut.UTILISATEUR_NON_TROUVE ) {
             return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Utilisateur non trouvé."));
-        } else {
-            if(!supprPersonne) {
-                Personne p = utilisateur;
-                p.save(); // TODO vérifier ça!!!!
-            }
-            utilisateur.delete();
+        } else if( statut == UtilisateurService.Statut.OK ) {
             return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Utilisateur supprimé."));
+        } else {
+            Logger.error("Controllers/Admin - majUtilisateur - statut inconnu: " + statut.name());
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Erreur interne. Les administrateurs ont été prévenus."));
         }
-
         // attendu: msg.statut
     }
 
