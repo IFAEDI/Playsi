@@ -170,10 +170,6 @@ public class Admin extends Controller {
         // attendu: msg.statut
     }
 
-    public static Result annuaire() {
-        return TODO;
-    }
-
     public static Result rifs() {
         return TODO;
     }

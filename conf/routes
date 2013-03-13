@@ -23,7 +23,7 @@ POST    /admin/users                controllers.Admin.majUtilisateur()
 POST    /admin/users/delete         controllers.Admin.supprimerUtilisateur(id: Long, supprPersonne: Boolean)
 
 GET     /admin/log                  controllers.Admin.journal()
-GET     /admin/annuaire             controllers.Admin.annuaire()
+GET     /admin/annuaire             controllers.Aedi.annuaire()
 GET     /admin/rifs                 controllers.Admin.rifs()
 GET     /admin/simulations          controllers.Admin.simulations()
 
