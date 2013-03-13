@@ -1,6 +1,8 @@
 package models;
 
+import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
+import play.libs.Json;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -26,6 +28,17 @@ public class CommentaireEntreprise extends Model{
     private Integer categorie;
 
     private Utilisateur auteur;
+
+    public ObjectNode toJson() {
+        ObjectNode json = Json.newObject();
+        // TODO constantes JSON
+        json.put("id_commentaire", id);
+        json.put("contenu", contenu);
+        json.put("categorie", categorie);
+        json.put("timestamp", date.toString()); // TODO vérifier que ça marche, sinon date format
+        json.put("personne", auteur.toJsonMinimal() ); // TODO vérifier rôle ordinal ou rôle chaine
+        return json;
+    }
 
     // généré par l'IDE
 

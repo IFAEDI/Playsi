@@ -1,7 +1,11 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
+import play.libs.Json;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -37,6 +41,34 @@ public class Entreprise extends Model {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<CommentaireEntreprise> commentaires;
+
+    public final static String DB_NOM = "nom";
+
+    public ObjectNode toJson() {
+        ObjectNode json = Json.newObject();
+
+        ObjectNode jsonDescription = Json.newObject();
+        jsonDescription.put("nom", nom);
+        jsonDescription.put("secteur", secteur);
+        jsonDescription.put("description", description);
+        jsonDescription.put("commentaire", commentaire);
+
+        json.put("description", description);
+
+        ArrayNode jsonContacts = new ArrayNode(JsonNodeFactory.instance);
+        for( ContactEntreprise ce : contacts ) {
+            jsonContacts.add( ce.toJson() );
+        }
+        json.put("contacts", jsonContacts);
+
+        ArrayNode jsonComm = new ArrayNode(JsonNodeFactory.instance);
+        for( CommentaireEntreprise ce: commentaires ) {
+            jsonComm.add( ce.toJson() );
+        }
+        json.put("commentaires", jsonComm );
+
+        return json;
+    }
 
     // généré par l'IDE
 

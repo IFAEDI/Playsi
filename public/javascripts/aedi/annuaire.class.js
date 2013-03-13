@@ -94,20 +94,12 @@ Annuaire.Colors = {
  */
 Annuaire.chercherInfoEntreprise = function chercherInfoEntreprise(/* int */ idEntreprise, /* void function(void) */ callback ) {
 	// Requête Ajax :
-	var /* objet */ requete = $.ajax({
-		url: "./annuaire/ajax/infoEntreprise.cible.php",
-		type: "POST",
-		data: {id : idEntreprise},
-		dataType: "json"
-	});
-
-	requete.done(function(donnees) {
-		callback(donnees);
-	});
-	requete.fail(function(jqXHR, textStatus) {
-		Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
-	});
-
+    jsRoutes.controllers.Aedi.infosEnterprise(idEntreprise).ajax({
+       success: callback,
+       error: function(jqXHR, textStatus) {
+           Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
+       }
+    });
 };
 
 /** 
@@ -1031,11 +1023,12 @@ Annuaire.traduireCategorieCommentaire = function traduireCategorieCommentaire(/*
  */
 Annuaire.afficherInfoEntreprise = function afficherInfoEntreprise(/* objet */ donnees) {
 
-	if (typeof donnees.entreprise === "undefined") { Annuaire.afficherErreur( "Désolé, cette entreprise n'est pas en BDD." ); return; }
+    if( donnees.statut !== 'ok' ) {
+        Annuaire.afficherErreur("Erreur : " +donnees.mesg);
+    }
 	Annuaire.infoEntrepriseCourante = donnees.entreprise;
 	donnees = donnees.entreprise;
-	if (typeof donnees === "undefined") { Annuaire.afficherErreur( "Désolé, cette entreprise n'est pas en BDD." ); return; }
-	
+
 	// Génération du html par templating :
 	donnees.droitModification = Annuaire.droitModification;
 	$(".module .hero-unit").html( Annuaire.templates['InfoEntreprise'](donnees) );

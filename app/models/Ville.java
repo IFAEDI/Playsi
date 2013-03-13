@@ -1,7 +1,9 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
+import play.libs.Json;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -27,6 +29,15 @@ public class Ville extends Model {
 
     @Length(max=30)
     private String pays;
+
+    ObjectNode toJson() {
+        ObjectNode json = Json.newObject();
+        // TODO constantes json
+        json.put("code_postal", codePostal);
+        json.put("libelle", libelle);
+        json.put("pays", pays);
+        return json;
+    }
 
     // généré par l'IDE
 

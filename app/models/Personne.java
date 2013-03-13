@@ -1,7 +1,12 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import controllers.Utils.Constantes;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
+import play.libs.Json;
 
 import javax.persistence.*;
 import java.util.List;
@@ -64,6 +69,28 @@ public class Personne extends Model {
 
     protected Boolean premiereConnexion;
     protected Role role;
+
+    public ObjectNode toJson() {
+        ObjectNode json = Json.newObject();
+        json.put(Constantes.JSON_NOM, nom);
+        json.put(Constantes.JSON_PRENOM, prenom);
+        return json;
+    }
+
+    public ObjectNode jsonAjouterTelMails( ObjectNode json ) {
+        ArrayNode jMails = new ArrayNode(JsonNodeFactory.instance);
+        for( Mail m : mails ) {
+            jMails.add( m.toJson() );
+        }
+        json.put(Constantes.JSON_MAILS, jMails);
+
+        ArrayNode jTels = new ArrayNode(JsonNodeFactory.instance);
+        for( Telephone t : telephones ) {
+            jTels.add( t.toJson() );
+        }
+        json.put(Constantes.JSON_TELEPHONES, jTels);
+        return json;
+    }
 
     // généré par l'IDE
 

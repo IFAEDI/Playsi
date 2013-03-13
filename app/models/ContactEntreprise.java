@@ -1,7 +1,8 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
-import play.db.ebean.Model;
+import org.codehaus.jackson.node.ObjectNode;
+import play.libs.Json;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,7 +15,7 @@ import javax.persistence.Id;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class ContactEntreprise extends Model {
+public class ContactEntreprise extends Personne {
 
     @Id
     private Long id;
@@ -27,6 +28,23 @@ public class ContactEntreprise extends Model {
     private String commentaire;
 
     private Ville ville;
+
+    public ObjectNode toJson() {
+        ObjectNode json = Json.newObject();
+
+        // TODO constantes JSON
+        json.put("id_contact", id);
+
+        ObjectNode personne = super.toJson();
+        personne = super.jsonAjouterTelMails(json);
+        json.put("personne", personne);
+
+        json.put("ville", ville.toJson());
+        json.put("commentaire", commentaire);
+        json.put("fonction", fonction);
+        json.put("priorite", priorite);
+        return json;
+    }
 
     // généré par l'IDE
 

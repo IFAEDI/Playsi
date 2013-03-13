@@ -61,7 +61,7 @@ $('document').ready(function() {
 			Annuaire.updaterEntreprise();
 		}
 	});
-	// ---- Ajout d'une condition spéciale à la validation du form pur le nom de l'entreprise :
+	// ---- Ajout d'une condition spéciale à la validation du form pour le nom de l'entreprise :
 	validatorEntreprise.registerCallback('validate_entreprise', function(value) {
 		// S'il s'agit de l'ajout d'une nouvelle entreprise ou de la modification du nom d'une entreprise existante, on vérifie que ce nom n'est pas déja pris.
 		
@@ -82,20 +82,15 @@ $('document').ready(function() {
 		var nomNonPris = true;
 		if ((idEntreprise == 0) || nomModifie) {
 			nomNonPris = false;
-			var /* objet */ requete = $.ajax({
-				url: "./annuaire/ajax/existEntreprise.cible.php",
-				type: "POST",
-				async: false,
-				data: {name : value},
-				dataType: "json",
+            jsRoutes.controllers.Aedi.annuaireExisteEnteprise(value).ajax({
 				success : function(donnees) {
-					if( donnees.code == 'ok' ) {
-						nomNonPris = !donnees.answer;
-					}
-					else {
+					if( donnees.statut == 'ok' ) {
+						nomNonPris = !donnees.dejaPris;
+					} else {
 						Annuaire.afficherErreur( donnees.mesg );
 					}
 				},
+
 				error :  function() {
 					Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur." );
 				}

@@ -168,6 +168,7 @@ public class StaticPages extends Controller {
                         routes.javascript.Admin.infoUtilisateur(),
                         routes.javascript.Admin.supprimerUtilisateur(),
                         // aedi: annuaire
+                        routes.javascript.Aedi.annuaireExisteEntreprise(),
                         routes.javascript.Aedi.annuaireInfosEntreprise(),
                         routes.javascript.Aedi.annuaireMajEntreprise(),
                         routes.javascript.Aedi.annuaireSupprimerEntreprise(),

@@ -2,10 +2,7 @@ package models;
 
 import com.avaje.ebean.validation.Length;
 import controllers.Utils.Constantes;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
-import play.libs.Json;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -57,12 +54,10 @@ public class Utilisateur extends Personne {
     }
 
     public ObjectNode toJsonMinimal() {
-        ObjectNode json = Json.newObject();
+        ObjectNode json = super.toJson();
         json.put(Constantes.JSON_LOGIN, login);
         json.put(Constantes.JSON_SERVICE, auth_service.ordinal());
         json.put(Constantes.JSON_ROLE_ORDINAL, role.ordinal());
-        json.put(Constantes.JSON_NOM, nom);
-        json.put(Constantes.JSON_PRENOM, prenom);
         json.put(Constantes.JSON_ID, id);
         return json;
     }
@@ -73,19 +68,7 @@ public class Utilisateur extends Personne {
      */
     public ObjectNode toJsonFull() {
         ObjectNode json = toJsonMinimal();
-
-        ArrayNode jMails = new ArrayNode(JsonNodeFactory.instance);
-        for( Mail m : mails ) {
-            jMails.add( m.toJson() );
-        }
-        json.put(Constantes.JSON_MAILS, jMails);
-
-        ArrayNode jTels = new ArrayNode(JsonNodeFactory.instance);
-        for( Telephone t : telephones ) {
-            jTels.add( t.toJson() );
-        }
-        json.put(Constantes.JSON_TELEPHONES, jTels);
-
+        json = jsonAjouterTelMails(json);
         return json;
     }
 
