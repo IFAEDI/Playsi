@@ -22,10 +22,14 @@ import java.util.Set;
  */
 public class Aedi extends Controller {
 
+    private static boolean utilisateurEstAuthorise() {
+        Personne.Role role = Securite.utilisateur().getRole();
+        return ( role == Personne.Role.ADMIN || role == Personne.Role.AEDI );
+    }
+
     @Security.Authenticated(Securite.class)
     public static Result annuaire() {
-        Personne.Role role = Securite.utilisateur().getRole();
-        if( !( role == Personne.Role.ADMIN || role == Personne.Role.AEDI ) ) {
+        if( !utilisateurEstAuthorise() ) {
             return unauthorized();
         }
 
@@ -52,5 +56,69 @@ public class Aedi extends Controller {
 
         // TODO dernier argument
         return ok( views.html.aedi.annuaire.render(entreprises, secteurs, fonctions, true) );
+    }
+
+    @Security.Authenticated(SecuriteAPI.class)
+    public static Result annuaireInfosEntreprise(Long id) {
+        if( !utilisateurEstAuthorise() ) {
+            return unauthorized();
+        }
+        return TODO;
+    }
+
+    @Security.Authenticated(SecuriteAPI.class)
+    public static Result annuaireMajEntreprise(Long id, String nom, String secteur, String description, String commentaire) {
+        if( !utilisateurEstAuthorise() ) {
+            return unauthorized();
+        }
+        return TODO;
+    }
+
+    @Security.Authenticated(SecuriteAPI.class)
+    public static Result annuaireSupprimerEntreprise(Long id) {
+        if( !utilisateurEstAuthorise() ) {
+            return unauthorized();
+        }
+        return TODO;
+    }
+
+    @Security.Authenticated(SecuriteAPI.class)
+    public static Result annuaireNouveauCommentaire(Long id, String contenu, Integer categorie) {
+        if( !utilisateurEstAuthorise() ) {
+            return unauthorized();
+        }
+        return TODO;
+    }
+
+    @Security.Authenticated(SecuriteAPI.class)
+    public static Result annuaireSupprimerCommentaire(Long id) {
+        if( !utilisateurEstAuthorise() ) {
+            return unauthorized();
+        }
+        return TODO;
+    }
+
+    @Security.Authenticated(SecuriteAPI.class)
+    public static Result annuaireRechercheContacts(String motscles) {
+        if( !utilisateurEstAuthorise() ) {
+            return unauthorized();
+        }
+        return TODO;
+    }
+
+    @Security.Authenticated(SecuriteAPI.class)
+    public static Result annuaireMajContact() {
+        if( !utilisateurEstAuthorise() ) {
+            return unauthorized();
+        }
+        return TODO;
+    }
+
+    @Security.Authenticated(SecuriteAPI.class)
+    public static Result annuaireSupprimerContact(Long id) {
+        if( !utilisateurEstAuthorise() ) {
+            return unauthorized();
+        }
+        return TODO;
     }
 }

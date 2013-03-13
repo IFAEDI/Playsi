@@ -166,7 +166,16 @@ public class StaticPages extends Controller {
                         routes.javascript.Admin.listeUtilisateurs(),
                         routes.javascript.Admin.labelsUtilisateurs(),
                         routes.javascript.Admin.infoUtilisateur(),
-                        routes.javascript.Admin.supprimerUtilisateur()
+                        routes.javascript.Admin.supprimerUtilisateur(),
+                        // aedi: annuaire
+                        routes.javascript.Aedi.annuaireInfosEntreprise(),
+                        routes.javascript.Aedi.annuaireMajEntreprise(),
+                        routes.javascript.Aedi.annuaireSupprimerEntreprise(),
+                        routes.javascript.Aedi.annuaireNouveauCommentaire(),
+                        routes.javascript.Aedi.annuaireSupprimerCommentaire(),
+                        routes.javascript.Aedi.annuaireRechercheContacts(),
+                            // Aedi.annuaireMajContact reconstruit l'objet json
+                        routes.javascript.Aedi.annuaireSupprimerContact()
                 )
         );
     }
