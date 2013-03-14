@@ -7,6 +7,7 @@
  */
 
 import com.avaje.ebean.Ebean;
+import models.Personne;
 import models.Stage;
 import models.Utilisateur;
 import play.Application;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 public class Global extends GlobalSettings {
 
-    static public void loadFixtures() {
+    static public void loadDevFixtures() {
         Logger.info("Insertion de valeurs en bdd...");
         Map<String, List<Object> > fixtures = (Map<String, List<Object>>) Yaml.load("fixtures.yml");
 
@@ -40,12 +41,22 @@ public class Global extends GlobalSettings {
         Logger.info("Insertion de valeurs en bdd: Fait.");
     }
 
+    static private void loadRootFixture() {
+        if( Ebean.find(Utilisateur.class).where().eq("role", Personne.Role.ADMIN).findRowCount() == 0) {
+            Logger.info("Insertion de l'utilisateur root...");
+            Map<String, List<Object> > fixtures = (Map<String, List<Object>>) Yaml.load("root.yml");
+            Ebean.save(fixtures.get("users"));
+            Logger.info("Chargement de l'utilisateur root effectué.");
+        }
+    }
+
     @Override
     public void onStart(Application app) {
         // en mode développement, insérer des valeurs en bdd
         if( app.isDev() ) {
-            loadFixtures();
+            loadDevFixtures();
         }
+        loadRootFixture();
     }
 
     @Override

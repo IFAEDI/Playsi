@@ -28,14 +28,14 @@ stages:
     description: KIKOU LAY ZAMIS.
 users:
   - !!models.Utilisateur
-    login: root
-    passwd: 435b41068e8665513a20070c033b08b9c66e4332
+    login: albert
+    passwd: 7aa129f67fde68c6d88aa58b8b8c5c28eb7dd3a3
     auth_service: REGULIERE
     banni: no
-    nom: Admin
-    prenom: John
+    nom: Leussinkiemousketaire
+    prenom: Albert
     premiereConnexion: no
-    role: ADMIN
+    role: ETUDIANT
     telephones:
       - !!models.Telephone
         intitule: Portable
@@ -44,5 +44,5 @@ users:
     mails:
       - !!models.Mail
         intitule: Personnel
-        email: example@example.com
+        email: albert@example.com
         priorite: 0

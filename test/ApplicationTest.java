@@ -27,7 +27,7 @@ public class ApplicationTest {
     @Before
     public void setUp() {
         start(fakeApplication(inMemoryDatabase()));
-        Global.loadFixtures();
+        Global.loadDevFixtures();
     }
 
     @Test
