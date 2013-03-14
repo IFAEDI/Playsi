@@ -39,6 +39,20 @@ public class Ville extends Model {
         return json;
     }
 
+    public static Ville construire(ObjectNode root) {
+        String codePostal = root.get("code_postal").asText();
+        String libelle = root.get("libelle").asText();
+        String pays = root.get("pays").asText();
+        Ville ville = null;
+        if( !codePostal.isEmpty() || !libelle.isEmpty() || !pays.isEmpty() ) {
+            ville = new Ville();
+            ville.setCodePostal(codePostal);
+            ville.setLibelle(libelle);
+            ville.setPays(pays);
+        }
+        return ville;
+    }
+
     // généré par l'IDE
 
     public Long getId() {

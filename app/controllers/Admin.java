@@ -100,7 +100,8 @@ public class Admin extends Controller {
             return unauthorized();
         }
 
-        Utilisateur nouveau = StaticPages.parseUtilisateur(true);
+        ObjectNode root = (ObjectNode) request().body().asJson();
+        Utilisateur nouveau = Utilisateur.construire(root, true);
         if( nouveau == null ) {
             return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Arguments manquants."));
         }

@@ -2,6 +2,7 @@ package models;
 
 import com.avaje.ebean.validation.Length;
 import controllers.Utils.Constantes;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
@@ -71,6 +72,59 @@ public class Personne extends Model {
 
     protected Boolean premiereConnexion;
     protected Role role;
+
+    public static Personne construire(ObjectNode root, boolean entierRequis) {
+        Personne p = new Personne();
+
+        if( !root.has(Constantes.JSON_NOM) || !root.has(Constantes.JSON_PRENOM)
+                || !root.has(Constantes.JSON_MAILS) || !root.has(Constantes.JSON_TELEPHONES)) {
+
+            return null;
+        }
+
+        if( entierRequis && (!root.has(Constantes.JSON_ID) || !root.has(Constantes.JSON_ROLE) ) ) {
+
+            return null;
+        }
+
+        if( entierRequis ) {
+            p.setId(root.get(Constantes.JSON_ID).asLong());
+            p.setRole(Personne.Role.parOrdinal(root.get(Constantes.JSON_ROLE).asInt()));
+        }
+
+        p.setNom(root.get(Constantes.JSON_NOM).asText());
+        p.setPrenom(root.get(Constantes.JSON_PRENOM).asText());
+
+        List<Mail> mails = new ArrayList<Mail>();
+        // Reconstruction des emails: récupérer
+        for( JsonNode jn : (ArrayNode) root.get(Constantes.JSON_MAILS) ) {
+            ObjectNode on = (ObjectNode) jn;
+            if( !on.has(Constantes.JSON_EMAIL) ) {
+                // un objet "email" en json doit avoir au moins la clé "email"
+                return null;
+            }
+            Mail m = new Mail(on);
+            // ajoute l'email seulement s'il est rempli (non vide)
+            if( !m.getEmail().isEmpty() )
+                mails.add( m );
+        }
+        p.setMails(mails);
+
+        // idem que reconstruction emails
+        List<Telephone> tels = new ArrayList<Telephone>();
+        for( JsonNode jn : (ArrayNode) root.get(Constantes.JSON_TELEPHONES) ) {
+            ObjectNode on = (ObjectNode) jn;
+            if( !on.has(Constantes.JSON_NUMERO) ) {
+                return null;
+            }
+            Telephone t = new Telephone(on);
+            if( !t.getNumero().isEmpty() )
+                tels.add(t);
+        }
+        p.setTelephones(tels);
+
+        return p;
+    }
 
     public ObjectNode toJson() {
         ObjectNode json = Json.newObject();

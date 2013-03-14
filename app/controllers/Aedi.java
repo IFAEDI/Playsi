@@ -1,9 +1,9 @@
 package controllers;
 
-import controllers.Utils.Constantes;
 import controllers.Utils.JsonUtils;
-import models.*;
-import org.codehaus.jackson.JsonNode;
+import models.ContactEntreprise;
+import models.Entreprise;
+import models.Personne;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
@@ -13,7 +13,6 @@ import play.mvc.Security;
 import services.AnnuaireService;
 import views.html.aedi.annuaire;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -196,81 +195,6 @@ public class Aedi extends Controller {
         return ok(json);
     }
 
-    private static ContactEntreprise reconstruireCorpsContact(JsonNode root) {
-
-        if( !root.has("id_contact") || !root.has("personne")
-                || !root.get("personne").has("prenom")
-                || !root.get("personne").has("nom")
-                || !root.has("fonction") ) {
-            return null;
-        }
-
-        // TODO constantes json
-        Long idContact = root.get("id_contact").asLong();
-        String fonction = root.get("fonction").asText();
-        String commentaire = root.get("commentaire").asText();
-        Integer priorite = root.get("priorite").asInt();
-
-        // TODO factoriser récupération personne
-        ObjectNode personne = (ObjectNode) root.get("personne");
-        String nomPersonne = personne.get("nom").asText();
-        String prenomPersonne = personne.get("prenom").asText();
-
-        List<Mail> mails = new ArrayList<Mail>();
-        // Reconstruction des emails
-        for( JsonNode jn : (ArrayNode) personne.get(Constantes.JSON_MAILS) ) {
-            ObjectNode on = (ObjectNode) jn;
-            if( !on.has(Constantes.JSON_EMAIL) ) {
-                // un objet "email" en json doit avoir au moins la clé "email"
-                return null;
-            }
-            Mail m = new Mail(on);
-            // ajoute l'email seulement s'il est rempli (non vide)
-            if( !m.getEmail().isEmpty() ) {
-                mails.add(m);
-            }
-        }
-
-        // idem que reconstruction emails
-        List<Telephone> tels = new ArrayList<Telephone>();
-        for( JsonNode jn : (ArrayNode) personne.get(Constantes.JSON_TELEPHONES) ) {
-            ObjectNode on = (ObjectNode) jn;
-            if( !on.has(Constantes.JSON_NUMERO) ) {
-                return null;
-            }
-            Telephone t = new Telephone(on);
-            if( !t.getNumero().isEmpty() ) {
-                tels.add(t);
-            }
-        }
-
-        ObjectNode villeJson = (ObjectNode) root.get("ville");
-        String codePostal = villeJson.get("code_postal").asText();
-        String libelle = villeJson.get("libelle").asText();
-        String pays = villeJson.get("pays").asText();
-
-        ContactEntreprise nouveau = new ContactEntreprise();
-
-        if( !codePostal.isEmpty() || !libelle.isEmpty() || !pays.isEmpty() ) {
-            Ville ville = new Ville();
-            ville.setCodePostal(codePostal);
-            ville.setLibelle(libelle);
-            ville.setPays(pays);
-            nouveau.setVille(ville);
-        }
-
-        nouveau.setCommentaire(commentaire);
-        nouveau.setFonction(fonction);
-        nouveau.setId(idContact);
-        nouveau.setPriorite(priorite);
-        nouveau.setMails(mails);
-        nouveau.setTelephones(tels);
-        nouveau.setNom(nomPersonne);
-        nouveau.setPrenom(prenomPersonne);
-
-        return nouveau;
-    }
-
     @Security.Authenticated(SecuriteAPI.class)
     public static Result annuaireMajContact() {
         if( !utilisateurEstAuthorise() ) {
@@ -301,9 +225,9 @@ public class Aedi extends Controller {
          */
 
         // 1) reconstruction de la requête
-        JsonNode root = request().body().asJson();
+        ObjectNode root = (ObjectNode) request().body().asJson();
         Long idEntreprise = root.get("id_entreprise").asLong();
-        ContactEntreprise nouveau = reconstruireCorpsContact(root);
+        ContactEntreprise nouveau = ContactEntreprise.construire(root);
         if( nouveau == null ) {
             return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Arguments manquants"));
         }

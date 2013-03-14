@@ -53,6 +53,48 @@ public class Utilisateur extends Personne {
         return auth_service.getIntitule();
     }
 
+    /**
+     * Parse l'utilisateur depuis le corps de la requête, sans le sauver en bdd.
+     * Factorisé pour être utilisé dans StaticPages.majUtilisateur et Admin.infoUtilisateur
+     *
+     * @param entierRequis Faux si seules les infos accessibles pour la modification de son propre profil
+     *                     sont nécessaires, vrai autrement (toutes les infos sauf type_auth sont nécessaires).
+     * @return Un utilisateur si tous les arguments minimaux étaient présents, null sinon (ie
+     * il manque un argument).
+     */
+    public static Utilisateur construire(ObjectNode root, boolean entierRequis) {
+        if(!root.has(Constantes.JSON_PASSWORD)) {
+            return null;
+        }
+
+        if( entierRequis && !root.has(Constantes.JSON_LOGIN) ) {
+            return null;
+        }
+
+        Personne p = Personne.construire(root, entierRequis);
+
+        if(p == null ) {
+            return null;
+        }
+
+        Utilisateur u = new Utilisateur();
+        if( entierRequis)  {
+            u.setId(p.getId());
+            u.setRole(p.getRole());
+        }
+        u.setNom(p.getNom());
+        u.setPrenom(p.getPrenom());
+        u.setMails(p.getMails());
+        u.setTelephones(p.getTelephones());
+
+        if( entierRequis ) {
+            u.setLogin(root.get(Constantes.JSON_LOGIN).asText());
+        }
+        u.setPasswd(root.get(Constantes.JSON_PASSWORD).asText());
+
+        return u;
+    }
+
     public ObjectNode toJsonMinimal() {
         ObjectNode json = super.toJson();
         json.put(Constantes.JSON_LOGIN, login);

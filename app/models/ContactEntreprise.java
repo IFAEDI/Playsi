@@ -30,6 +30,43 @@ public class ContactEntreprise extends Personne {
     @ManyToOne
     private Entreprise entreprise;
 
+    public static ContactEntreprise construire(ObjectNode root) {
+
+        // TODO constantes json
+        if( !root.has("id_contact") || !root.has("personne")
+                || !root.get("personne").has("prenom")
+                || !root.get("personne").has("nom")
+                || !root.has("fonction") ) {
+            return null;
+        }
+
+        ObjectNode personneJson = (ObjectNode) root.get("personne");
+        Personne p = Personne.construire(personneJson, false);
+        ContactEntreprise nouveau = new ContactEntreprise();
+
+        nouveau.setNom(p.getNom());
+        nouveau.setPrenom(p.getPrenom());
+        nouveau.setMails(p.getMails());
+        nouveau.setTelephones(p.getTelephones());
+
+        // TODO constantes json
+        Long idContact = root.get("id_contact").asLong();
+        String fonction = root.get("fonction").asText();
+        String commentaire = root.get("commentaire").asText();
+        Integer priorite = root.get("priorite").asInt();
+
+        ObjectNode villeJson = (ObjectNode) root.get("ville");
+        Ville ville = Ville.construire(villeJson);
+
+        nouveau.setVille(ville);
+        nouveau.setCommentaire(commentaire);
+        nouveau.setFonction(fonction);
+        nouveau.setId(idContact);
+        nouveau.setPriorite(priorite);
+
+        return nouveau;
+    }
+
     public ObjectNode toJson() {
         ObjectNode json = Json.newObject();
 
