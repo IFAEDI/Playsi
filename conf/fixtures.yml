@@ -36,3 +36,13 @@ users:
     prenom: John
     premiereConnexion: no
     role: ADMIN
+    telephones:
+      - !!models.Telephone
+        intitule: Portable
+        numero: 0612345678
+        priorite: 0
+    mails:
+      - !!models.Mail
+        intitule: Personnel
+        email: example@example.com
+        priorite: 0
