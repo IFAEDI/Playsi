@@ -62,7 +62,7 @@ function CasAuthentification( username, password,  url, callback) {
 		url,
 		function (errors, window) {
 			// On recupère les valeurs manquantes pour notre formulaire : 
-			formulaire['lt'] = window.document.querySelector('input[name="lt"]).value;
+			formulaire['lt'] = window.document.querySelector('input[name="lt"']).value;
 			url = window.document.getElementById('#login_form').action;
 			if (url.indexOf("?") != -1) { url += "&"; }
 			else { url += "?"; }
