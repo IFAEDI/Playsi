@@ -35,8 +35,6 @@ public class Entreprise extends Model {
     @Length(max=50)
     private String secteur;
 
-    private String commentaire; // TODO vérifier que le champ commentaire de Entreprise est utilisé?
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "entreprise")
     private List<ContactEntreprise> contacts;
 
@@ -53,7 +51,6 @@ public class Entreprise extends Model {
         jsonDescription.put(Constantes.JSON_NOM, nom);
         jsonDescription.put(Constantes.JSON_SECTEUR, secteur);
         jsonDescription.put(Constantes.JSON_DESCRIPTION, description);
-        jsonDescription.put(Constantes.JSON_COMMENTAIRE, commentaire);
         json.put(Constantes.JSON_ENTREPRISE, jsonDescription);
 
         ArrayNode jsonContacts = new ArrayNode(JsonNodeFactory.instance);
@@ -103,14 +100,6 @@ public class Entreprise extends Model {
 
     public void setSecteur(String secteur) {
         this.secteur = secteur;
-    }
-
-    public String getCommentaire() {
-        return commentaire;
-    }
-
-    public void setCommentaire(String commentaire) {
-        this.commentaire = commentaire;
     }
 
     public List<ContactEntreprise> getContacts() {
