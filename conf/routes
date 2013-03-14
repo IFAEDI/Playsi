@@ -1,0 +1,56 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Static pages
+GET     /                           controllers.StaticPages.index()
+GET     /apropos                    controllers.StaticPages.apropos()
+GET     /contact                    controllers.StaticPages.contact()
+GET     /auth                       controllers.StaticPages.authRequise()
+GET     /jsroutes                   controllers.StaticPages.javascriptRoutes()
+
+# api pages statiques
+POST    /login                      controllers.StaticPages.login(username: String, password: String)
+POST    /user                       controllers.StaticPages.majUtilisateur()
+GET     /logout                     controllers.StaticPages.logout()
+
+# Modules privés
+GET     /admin/users                controllers.Admin.utilisateurs()
+GET     /admin/users/list           controllers.Admin.listeUtilisateurs()
+GET     /admin/users/labels         controllers.Admin.labelsUtilisateurs()
+GET     /admin/users/:id            controllers.Admin.infoUtilisateur(id: Long)
+POST    /admin/users                controllers.Admin.majUtilisateur()
+POST    /admin/users/del            controllers.Admin.supprimerUtilisateur(id: Long, supprPersonne: Boolean)
+
+GET     /admin/annuaire                 controllers.Aedi.annuaire()
+GET     /admin/annuaire/corp/name/      controllers.Aedi.annuaireExisteEntreprise(nom: String)
+GET     /admin/annuaire/corp/:id        controllers.Aedi.annuaireInfosEntreprise(id: Long)
+POST    /admin/annuaire/corp/:id        controllers.Aedi.annuaireMajEntreprise(id: Long, nom: String, secteur: String, description: String)
+POST    /admin/annuaire/corp/:id/del    controllers.Aedi.annuaireSupprimerEntreprise(id: Long)
+POST    /admin/annuaire/comm/           controllers.Aedi.annuaireNouveauCommentaire(id: Long, contenu: String, categorie: Int)
+POST    /admin/annuaire/comm/:id/del    controllers.Aedi.annuaireSupprimerCommentaire(id: Long)
+GET     /admin/annuaire/contact/        controllers.Aedi.annuaireRechercheContacts(motscles: String)
+POST    /admin/annuaire/contact/        controllers.Aedi.annuaireMajContact()
+POST    /admin/annuaire/contact/:id/del controllers.Aedi.annuaireSupprimerContact(id: Long)
+
+GET     /admin/log                  controllers.Admin.journal()
+GET     /admin/rifs                 controllers.Admin.rifs()
+GET     /admin/simulations          controllers.Admin.simulations()
+
+# domaine Etudiants
+GET     /etudiants/entretiens       controllers.Etudiants.entretiens()
+GET     /etudiants/stages           controllers.Etudiants.stages()
+GET     /etudiants/evenements       controllers.Etudiants.evenements()
+
+# api Etudiants
+POST    /etudiants/stages/          controllers.Etudiants.apiStages(mots_cles_str: String, annee: Integer, lieu: String, entreprise: String)
+
+# domaine Entreprises
+GET     /entreprises/rifs           controllers.Entreprises.rifs()
+GET     /entreprises/entretiens     controllers.Entreprises.entretiens_presentation()
+GET     /entreprises/entretiens/inscription     controllers.Entreprises.entretiens_inscription()
+GET     /entreprises/conferences    controllers.Entreprises.conferences()
+GET     /entreprises/parrainage     controllers.Entreprises.parrainage()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
