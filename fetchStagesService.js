@@ -8,7 +8,7 @@ var urlCas = 'https://login.insa-lyon.fr/'
 var urlStage = 'http://intranet-if.insa-lyon.fr/stages/Listestage.php'
 
 var serverPort = 6789;
-  
+	
 http.createServer(function(request, response) {
     
 	if(request.url == '/fetchStages') {
@@ -22,6 +22,24 @@ http.createServer(function(request, response) {
 	}
 }).listen(serverPort);
 
+
+/**
+ * URI-encode un objet
+ * Param :
+ *	- obj : 	Objet à serialiser
+ *	- prefix : 	Préfixe optionnel
+ * Retour : String uri-encodée
+ */
+function EncodeURIObject(obj, prefix) {
+    var str = [];
+    for(var p in obj) {
+        var k = prefix ? prefix + "[" + encodeURIComponent(p) + "]" : encodeURIComponent(p), v = obj[p];
+        str.push(typeof v == "object" ? 
+            UrlEncodeObject(v, k) :
+            encodeURIComponent(k) + "=" + encodeURIComponent(v));
+    }
+    return str.join("&");
+}
 
 /**
  * Permet de s'authentifier avec le cas de l'insa de Lyon.
@@ -42,11 +60,13 @@ function CasAuthentification( username, password,  url, callback) {
 	
 	jsdom.env(
 		url,
-		["http://code.jquery.com/jquery.js"],
 		function (errors, window) {
 			// On recupère les valeurs manquantes pour notre formulaire : 
-			formulaire['lt'] = window.$('input[name="lt"']).val();
-			url = url + window.$('#login_form').attr('action') + window.$.param(formulaire);
+			formulaire['lt'] = window.document.querySelector('input[name="lt"]).value;
+			url = window.document.getElementById('#login_form').action;
+			if (url.indexOf("?") != -1) { url += "&"; }
+			else { url += "?"; }
+			url += EncodeURIObject(formulaire);
 			// On  peut maintenant effectuer la connexion :
 			jsdom.env(
 				url,
