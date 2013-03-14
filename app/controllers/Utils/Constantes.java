@@ -51,4 +51,10 @@ public class Constantes {
     public static final String JSON_CODE_POSTAL = "code_postal";
     public static final String JSON_LIBELLE = "libelle";
     public static final String JSON_PAYS = "pays";
+    public static final String JSON_ID_ENTREPRISE = "id_entreprise";
+    public static final String JSON_SECTEUR = "secteur";
+    public static final String JSON_DESCRIPTION = "description";
+    public static final String JSON_ENTREPRISE = "description";
+    public static final String JSON_CONTACTS = "contacts";
+    public static final String JSON_COMMENTAIRES = "commentaires";
 }

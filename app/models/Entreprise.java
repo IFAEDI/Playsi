@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import controllers.Utils.Constantes;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
@@ -48,24 +49,24 @@ public class Entreprise extends Model {
         ObjectNode json = Json.newObject();
 
         ObjectNode jsonDescription = Json.newObject();
-        jsonDescription.put("id_entreprise", id);
-        jsonDescription.put("nom", nom);
-        jsonDescription.put("secteur", secteur);
-        jsonDescription.put("description", description);
-        jsonDescription.put("commentaire", commentaire);
-        json.put("description", jsonDescription);
+        jsonDescription.put(Constantes.JSON_ID_ENTREPRISE, id);
+        jsonDescription.put(Constantes.JSON_NOM, nom);
+        jsonDescription.put(Constantes.JSON_SECTEUR, secteur);
+        jsonDescription.put(Constantes.JSON_DESCRIPTION, description);
+        jsonDescription.put(Constantes.JSON_COMMENTAIRE, commentaire);
+        json.put(Constantes.JSON_ENTREPRISE, jsonDescription);
 
         ArrayNode jsonContacts = new ArrayNode(JsonNodeFactory.instance);
         for( ContactEntreprise ce : contacts ) {
             jsonContacts.add( ce.toJson() );
         }
-        json.put("contacts", jsonContacts);
+        json.put(Constantes.JSON_CONTACTS, jsonContacts);
 
         ArrayNode jsonComm = new ArrayNode(JsonNodeFactory.instance);
         for( CommentaireEntreprise ce: commentaires ) {
             jsonComm.add( ce.toJson() );
         }
-        json.put("commentaires", jsonComm );
+        json.put(Constantes.JSON_COMMENTAIRES, jsonComm );
 
         return json;
     }
