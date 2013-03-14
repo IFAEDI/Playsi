@@ -60,7 +60,6 @@
 
                                 <li><a href="@routes.Etudiants.entretiens()">Simulations d'entretiens</a></li>
                                 <li><a href="@routes.Etudiants.stages()">Stages</a></li>
-                                <li><a href="@routes.Etudiants.cvs()">CV</a></li>
 
                                 <li class="divider"></li>
 
@@ -78,14 +77,6 @@
                                 <li><a href="@routes.Entreprises.rifs()">Rencontres IF</a></li>
                                 <li><a href="@routes.Entreprises.entretiens_presentation()">Simulations d'entretiens</a></li>
                                 <li><a href="@routes.Entreprises.conferences()">Conférences</a></li>
-
-                                    <!-- TODO add link as soon as it's done
-                                <li class="divider"></li>
-
-                                <li class="nav-header"><i class="icon-book"></i> CVthèque</li>
-
-                                <li><a href="index.php?page=CV_Info">Offre</a></li>
-                                -->
 
                                 <li class="divider"></li>
 
@@ -120,9 +111,6 @@
                     </li>
                             }
 
-                            <!-- TODO add admin sections for AEDI and ADMIN for authentified people (menu.php)
-                            -->
-
                         <li class="divider-vertical"></li>
                         <li class=""><a href="@routes.StaticPages.apropos()"><i class="icon-info-sign icon-white"></i> A propos</a></li>
 
@@ -132,7 +120,7 @@
 
                     </ul>
 
-                        <!-- TODO changer le thème par numéro? gneu?
+                    <!-- TODO changer le thème par numéro? gneu?
                     <script>
                             //Fonction permettant de changer le theme par le numéro
                             // du theme passé en paramètre
@@ -218,7 +206,7 @@
                             <label class="control-label" for="email">Adresse mail</label>
                             <div class="controls">
                                 <div class="input-prepend">
-                                        <!-- TODO ajouter bouton "ajouter un email" -->
+                                        <!-- TODO ajouter bouton "ajouter un email" @@aldream -->
                                             @for( email <- Securite.utilisateur().getMails() ) {
                                     <div class="input-prepend">
                                         <span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_mail" type="text" value="@email.getIntitule()" />
@@ -237,7 +225,7 @@
                             <div class="controls">
                                 <div class="input-prepend">
                                     <div class="input-prepend">
-                                            <!-- TODO ajouter bouton "ajouter un téléphone" -->
+                                            <!-- TODO ajouter bouton "ajouter un téléphone" @@aldream -->
                                                 @for( tel <- Securite.utilisateur().getTelephones() ) {
                                         <div class="input-prepend">
                                             <span class="add-on" style="margin-top: -9px;"><i class="icon-info-sign"></i></span><input class="input-medium libelle_telephone" type="text" value="@tel.getIntitule()" />
@@ -311,11 +299,6 @@
         <li>
             <a href="@routes.StaticPages.index()"><i class="icon-home"></i></a> <span class="divider">/</span>
         </li>
-            <!-- TODO si module
-			<li>
-				echo $titre_module; <span class="divider">/</span>
-			</li>
-		-->
         <li class="active">@title</li>
     </ul>
 

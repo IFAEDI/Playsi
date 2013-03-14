@@ -27,7 +27,7 @@ import java.util.List;
 public class Etudiants extends Controller {
 
     public static Result entretiens() {
-        // TODO
+        // TODO pages des simulations d'entretiens étudiant
         return TODO;
     }
 
@@ -37,7 +37,7 @@ public class Etudiants extends Controller {
         switch (SecuriteAPI.utilisateur().getRole() ) {
             case ENSEIGNANT:
             case ENTREPRISE:
-                return unauthorized(); // TODO page indiquant que l'accès n'est pas autorisé, plutôt?
+                return unauthorized();
         }
 
         return ok(stages.render());
@@ -81,11 +81,6 @@ public class Etudiants extends Controller {
         }
         json.put(Constantes.JSON_STAGES, jsonStages);
         return ok(json);
-    }
-
-    public static Result cvs() {
-        // TODO
-        return TODO;
     }
 
     public static Result evenements() {

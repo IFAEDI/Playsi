@@ -1,5 +1,7 @@
 package models;
 
+import controllers.Utils.Constantes;
+import controllers.Utils.DateUtils;
 import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
 import play.libs.Json;
@@ -33,12 +35,11 @@ public class CommentaireEntreprise extends Model{
 
     public ObjectNode toJson() {
         ObjectNode json = Json.newObject();
-        // TODO constantes JSON
-        json.put("id_commentaire", id);
-        json.put("contenu", contenu);
-        json.put("categorie", categorie);
-        json.put("timestamp", date.toString()); // TODO vérifier que ça marche, sinon date format
-        json.put("personne", auteur.toJsonMinimal() ); // TODO vérifier rôle ordinal ou rôle chaine
+        json.put(Constantes.JSON_ID_COMMENTAIRE, id);
+        json.put(Constantes.JSON_CONTENU, contenu);
+        json.put(Constantes.JSON_CATEGORIE, categorie);
+        json.put(Constantes.JSON_TIMESTAMP, DateUtils.formaterDate(date));
+        json.put(Constantes.JSON_PERSONNE, auteur.toJsonMinimal() );
         return json;
     }
 

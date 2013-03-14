@@ -40,7 +40,6 @@ GET     /admin/simulations          controllers.Admin.simulations()
 # domaine Etudiants
 GET     /etudiants/entretiens       controllers.Etudiants.entretiens()
 GET     /etudiants/stages           controllers.Etudiants.stages()
-GET     /etudiants/cvs              controllers.Etudiants.cvs()
 GET     /etudiants/evenements       controllers.Etudiants.evenements()
 
 # api Etudiants

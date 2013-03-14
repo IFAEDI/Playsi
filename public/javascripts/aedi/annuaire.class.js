@@ -203,7 +203,7 @@ Annuaire.updaterEntreprise = function updaterEntreprise() {
         nom: nomEntr,
         secteur: $('#formUpdateEntrepriseSecteur').val(),
         description: $('#formUpdateEntrepriseDescription').val()
-    }; // TODO renommer description en entreprise
+    }; // TODO renommer (objet) description en entreprise
 
     jsRoutes.controllers.Aedi.annuaireMajEntreprise(description.id_entreprise, description.nom, description.secteur, description.description).ajax({
         success: function(donnees) {
@@ -383,7 +383,7 @@ Annuaire.updaterContact = function updaterContact() {
 				}, donnees.id);
 			}
 			else if (donnees.id == -1) { // Edition d'un contact :
-			    // TODO LOL EMPTY
+			    // TODO vide? @aldream
 			}
 			else {
 				Annuaire.afficherErreur('Contact - Une erreur est survenue (id = '+donnees.id+')' );
@@ -431,8 +431,7 @@ Annuaire.ajouterCommentaire = function ajouterCommentaire() {
                      nouveauCommentaire.id_commentaire = donnees.id;
                      if (typeof Annuaire.infoEntrepriseCourante.commentaires === "undefined") { Annuaire.infoEntrepriseCourante.commentaires = []; }
                      nouveauCommentaire.personne = donnees.personne;
-                     nouveauCommentaire.timestamp = new Date(); // TODO récupérer la date depuis le serveur
-                     nouveauCommentaire.timestamp = nouveauCommentaire.timestamp.format('yyyy-mm-dd hh:mm:ss');
+                     nouveauCommentaire.timestamp = donnees.timestamp;
                      Annuaire.infoEntrepriseCourante.commentaires.push(nouveauCommentaire);
                      var objSimulantReponseServeur = { statut: "ok", entreprise : Annuaire.infoEntrepriseCourante };
                      Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
@@ -1012,7 +1011,7 @@ Annuaire.afficherInfoEntreprise = function afficherInfoEntreprise(/* objet */ do
 	donnees = donnees.entreprise;
 
 	// Génération du html par templating :
-	donnees.droitModification = Annuaire.droitModification; // TODO gestion de la sécurité coté client? are you f***ing kidding me?
+	donnees.droitModification = Annuaire.droitModification; // TODO sécurité
 	$(".module .hero-unit").html( Annuaire.templates['InfoEntreprise'](donnees) );
 
 	// Possibilité de trier les tables :
@@ -1080,7 +1079,7 @@ Annuaire.afficherResultatRechercheContacts = function afficherResultatRechercheC
 	}
 	
 	// Génération du html par templating :
-	donnees.droitModification = Annuaire.droitModification; // TODO WTF?
+	donnees.droitModification = Annuaire.droitModification; // TODO sécurité
 	$(".module .hero-unit").html( Annuaire.templates['SearchContact'](donnees) );
 
 	// Possibilité de trier les tables :

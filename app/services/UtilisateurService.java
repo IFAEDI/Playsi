@@ -76,7 +76,6 @@ public class UtilisateurService {
             }
 
             // Suppression des anciennes valeurs de tels et mails
-            // TODO y a peut-être mieux? (trier téléphones actuels, trier téléphones du json, faire une comparaison 1 à 1)
             for( Telephone t : utilisateur.getTelephones() ) {
                 t.delete();
             }
@@ -169,7 +168,7 @@ public class UtilisateurService {
         } else {
             if(!supprimerPersonne) {
                 Personne p = utilisateur;
-                p.save(); // TODO vérifier ça!!!!
+                p.save(); // TODO vérifier utilité?
             }
             utilisateur.delete();
             return Statut.OK;

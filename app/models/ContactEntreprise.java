@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import controllers.Utils.Constantes;
 import org.codehaus.jackson.node.ObjectNode;
 import play.libs.Json;
 
@@ -30,17 +31,18 @@ public class ContactEntreprise extends Personne {
     @ManyToOne
     private Entreprise entreprise;
 
+    public static final String DB_FONCTION = "fonction";
+
     public static ContactEntreprise construire(ObjectNode root) {
 
-        // TODO constantes json
-        if( !root.has("id_contact") || !root.has("personne")
-                || !root.get("personne").has("prenom")
-                || !root.get("personne").has("nom")
-                || !root.has("fonction") ) {
+        if( !root.has(Constantes.JSON_ID_CONTACT) || !root.has(Constantes.JSON_PERSONNE)
+                || !root.get(Constantes.JSON_PERSONNE).has(Constantes.JSON_PRENOM)
+                || !root.get(Constantes.JSON_PERSONNE).has(Constantes.JSON_NOM)
+                || !root.has(Constantes.JSON_FONCTION) ) {
             return null;
         }
 
-        ObjectNode personneJson = (ObjectNode) root.get("personne");
+        ObjectNode personneJson = (ObjectNode) root.get(Constantes.JSON_PERSONNE);
         Personne p = Personne.construire(personneJson, false);
         ContactEntreprise nouveau = new ContactEntreprise();
 
@@ -49,13 +51,12 @@ public class ContactEntreprise extends Personne {
         nouveau.setMails(p.getMails());
         nouveau.setTelephones(p.getTelephones());
 
-        // TODO constantes json
-        Long idContact = root.get("id_contact").asLong();
-        String fonction = root.get("fonction").asText();
-        String commentaire = root.get("commentaire").asText();
-        Integer priorite = root.get("priorite").asInt();
+        Long idContact = root.get(Constantes.JSON_ID_CONTACT).asLong();
+        String fonction = root.get(Constantes.JSON_FONCTION).asText();
+        String commentaire = root.get(Constantes.JSON_COMMENTAIRE).asText();
+        Integer priorite = root.get(Constantes.JSON_PRIORITE).asInt();
 
-        ObjectNode villeJson = (ObjectNode) root.get("ville");
+        ObjectNode villeJson = (ObjectNode) root.get(Constantes.JSON_VILLE);
         Ville ville = Ville.construire(villeJson);
 
         nouveau.setVille(ville);
@@ -70,19 +71,18 @@ public class ContactEntreprise extends Personne {
     public ObjectNode toJson() {
         ObjectNode json = Json.newObject();
 
-        // TODO constantes JSON
-        json.put("id_contact", id);
+        json.put(Constantes.JSON_ID_CONTACT, id);
 
         ObjectNode personneJson = super.toJson();
         personneJson = super.jsonAjouterTelMails(personneJson);
-        json.put("personne", personneJson);
+        json.put(Constantes.JSON_PERSONNE, personneJson);
 
         if( ville != null ) {
-            json.put("ville", ville.toJson());
+            json.put(Constantes.JSON_VILLE, ville.toJson());
         }
-        json.put("commentaire", commentaire);
-        json.put("fonction", fonction);
-        json.put("priorite", priorite);
+        json.put(Constantes.JSON_COMMENTAIRE, commentaire);
+        json.put(Constantes.JSON_FONCTION, fonction);
+        json.put(Constantes.JSON_PRIORITE, priorite);
         return json;
     }
 

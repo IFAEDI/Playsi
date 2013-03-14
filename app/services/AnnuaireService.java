@@ -36,13 +36,12 @@ public class AnnuaireService {
         }
         infos.secteurs = new ArrayList<String>(secteursUniques);
 
-        // TODO meilleure requête pour récupérer les fonctions uniques (SELECT DISTINCT fonction)
-        List<ContactEntreprise> contacts = contFinder.all();
-        Set<String> fonctionsUniques = new HashSet<String>();
-        for( ContactEntreprise ce : contacts ) {
-            fonctionsUniques.add(ce.getFonction());
+        List<ContactEntreprise> contacts =
+                contFinder.select(ContactEntreprise.DB_FONCTION).setDistinct(true).findList();
+        infos.fonctions = new ArrayList<String>();
+        for( ContactEntreprise ce: contacts ) {
+            infos.fonctions.add(ce.getFonction());
         }
-        infos.fonctions = new ArrayList<String>(fonctionsUniques);
 
         return infos;
     }
@@ -139,6 +138,7 @@ public class AnnuaireService {
     public static class CreationCommentaireResult {
         public Statut statut;
         public Long id;
+        public Date timestamp;
     }
 
     public static CreationCommentaireResult ajouterCommentaire(Long idEntreprise, String contenu, Integer categorie) {
@@ -154,23 +154,25 @@ public class AnnuaireService {
             nouveauCommentaire.setAuteur(Securite.utilisateur());
             nouveauCommentaire.setCategorie(categorie);
             nouveauCommentaire.setContenu(contenu);
-            nouveauCommentaire.setDate(new Date());
+            Date maintenant = new Date();
+            nouveauCommentaire.setDate(maintenant);
 
             commentaires.add( nouveauCommentaire );
             entreprise.setCommentaires( commentaires );
             entreprise.save();
 
             result.statut = Statut.OK;
-            result.id = nouveauCommentaire.getId(); // TODO vérifier id bien reçu
+            result.id = nouveauCommentaire.getId();
+            result.timestamp = maintenant;
         }
 
         return result;
     }
 
     public static List<Entreprise> rechercherContacts(String motsclesStr) {
-        // TODO renvoyer au format attendu
-        // TODO faire la recherche par tous les champs
-        // TODO trouve les entreprises qui vérifient les conditions, n'isole pas les contacts.
+        // TODO renvoyer au format attendu @benjbouv
+        // TODO faire la recherche par tous les champs @benjbouv
+        // TODO trouve les entreprises qui vérifient les conditions, n'isole pas les contacts. @benjbouv
 
         String[] motscles = motsclesStr.split(" ");
         /*

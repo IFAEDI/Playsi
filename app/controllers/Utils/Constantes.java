@@ -38,4 +38,17 @@ public class Constantes {
 
     public static final String SESSION_ID = "session_id";
     public static final String SESSION_UTILISATEUR_SUFFIXE = ".utilisateur";
+
+    public static final String JSON_ID_COMMENTAIRE = "id_commentaire";
+    public static final String JSON_CONTENU = "contenu";
+    public static final String JSON_CATEGORIE = "categorie";
+    public static final String JSON_TIMESTAMP = "timestamp";
+    public static final String JSON_PERSONNE = "personne";
+    public static final String JSON_ID_CONTACT = "id_contact";
+    public static final String JSON_FONCTION = "fonction";
+    public static final String JSON_COMMENTAIRE = "commentaire";
+    public static final String JSON_VILLE = "ville";
+    public static final String JSON_CODE_POSTAL = "code_postal";
+    public static final String JSON_LIBELLE = "libelle";
+    public static final String JSON_PAYS = "pays";
 }

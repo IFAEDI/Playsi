@@ -18,7 +18,7 @@ $(document).ready( function() {
 * <=> Balancer le form sur la page courante avec une variable cachée (voir le form)
 */
 function cas_login() {
-    // TODO cas login, wtf?
+    // TODO cas login
 	$( "#cas_login_form" ).submit();
 }
 
@@ -149,7 +149,7 @@ function user_info_save() {
             if( msg.statut == "ok" ) {
                 $( "#navbar_username" ).html( ' ' + prenom + ' ' + nom );
                 $( "#user_info_dialog" ).modal( 'hide' );
-                document.location.reload(); // TODO réécrire tous les champs à partir des arguments envoyés?
+                document.location.reload();
             } else {
                 $( "#user_info_form #user_info_error" ).addClass( 'alert-error' );
 

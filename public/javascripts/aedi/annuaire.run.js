@@ -277,7 +277,7 @@ $('document').ready(function() {
 	$('#recherche').css('height', (window.innerHeight - 290)+'px');
 	
 	// Initialisation de l'objet Annuaire :
-	Annuaire.droitModification = ($("#inputModif").val()==1)?true:false; // TODO c'est une grosse blague
+	Annuaire.droitModification = ($("#inputModif").val()==1)?true:false; // TODO sécurité
 	if (Annuaire.droitModification) { $('#formOptionsEdition').attr('checked', true); }
 	Annuaire.initialiserTemplates();
 	

@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.validation.Length;
+import controllers.Utils.Constantes;
 import org.codehaus.jackson.node.ObjectNode;
 import play.db.ebean.Model;
 import play.libs.Json;
@@ -32,17 +33,16 @@ public class Ville extends Model {
 
     ObjectNode toJson() {
         ObjectNode json = Json.newObject();
-        // TODO constantes json
-        json.put("code_postal", codePostal);
-        json.put("libelle", libelle);
-        json.put("pays", pays);
+        json.put(Constantes.JSON_CODE_POSTAL, codePostal);
+        json.put(Constantes.JSON_LIBELLE, libelle);
+        json.put(Constantes.JSON_PAYS, pays);
         return json;
     }
 
     public static Ville construire(ObjectNode root) {
-        String codePostal = root.get("code_postal").asText();
-        String libelle = root.get("libelle").asText();
-        String pays = root.get("pays").asText();
+        String codePostal = root.get(Constantes.JSON_CODE_POSTAL).asText();
+        String libelle = root.get(Constantes.JSON_LIBELLE).asText();
+        String pays = root.get(Constantes.JSON_PAYS).asText();
         Ville ville = null;
         if( !codePostal.isEmpty() || !libelle.isEmpty() || !pays.isEmpty() ) {
             ville = new Ville();

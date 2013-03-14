@@ -1,5 +1,6 @@
 package controllers;
 
+import controllers.Utils.DateUtils;
 import controllers.Utils.JsonUtils;
 import models.ContactEntreprise;
 import models.Entreprise;
@@ -122,7 +123,7 @@ public class Aedi extends Controller {
         if( result.estCreation ) {
             json.put("id", result.id);
         } else {
-            json.put("id", -1); // TODO constantes json
+            json.put("id", -1);
         }
 
         // attendu: {statut, id >=0 si ajout et == -1 si modification}
@@ -157,6 +158,7 @@ public class Aedi extends Controller {
             ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Création effectuée.");
             json.put("id", result.id);
             json.put("personne", Securite.utilisateur().toJsonMinimal());
+            json.put("timestamp", DateUtils.formaterDate(result.timestamp));
             return ok(json);
         }
 
