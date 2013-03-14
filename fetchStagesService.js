@@ -45,7 +45,7 @@ function CasAuthentification( username, password,  url, callback) {
 		["http://code.jquery.com/jquery.js"],
 		function (errors, window) {
 			// On recupère les valeurs manquantes pour notre formulaire : 
-			formulaire['lt'] = window.$('input[name="lt"]).val();
+			formulaire['lt'] = window.$('input[name="lt"']).val();
 			url = url + window.$('#login_form').attr('action') + window.$.param(formulaire);
 			// On  peut maintenant effectuer la connexion :
 			jsdom.env(
