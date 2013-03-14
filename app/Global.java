@@ -14,6 +14,9 @@ import play.GlobalSettings;
 import play.Logger;
 import play.db.ebean.Model;
 import play.libs.Yaml;
+import play.mvc.Http;
+import play.mvc.Result;
+import play.mvc.Results;
 
 import java.util.List;
 import java.util.Map;
@@ -44,4 +47,15 @@ public class Global extends GlobalSettings {
             loadFixtures();
         }
     }
+
+    @Override
+    public Result onBadRequest(Http.RequestHeader request, String error) {
+        return Results.badRequest("La requête est invalide (arguments manquants, méthode incorrecte,...)");
+    }
+
+    @Override
+    public Result onHandlerNotFound(Http.RequestHeader request) {
+        return Results.notFound("Page non trouvée.");
+    }
+
 }
