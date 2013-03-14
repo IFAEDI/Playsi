@@ -15,7 +15,7 @@ public class Entreprises extends Controller {
 
     public static Result entretiens_inscription() {
         // TODO inscription aux simulations d'entretiens
-        return TODO;
+        return ok(views.html.construction.render());
     }
 
     public static Result entretiens_presentation() {

@@ -28,7 +28,7 @@ public class Etudiants extends Controller {
 
     public static Result entretiens() {
         // TODO pages des simulations d'entretiens étudiant
-        return TODO;
+        return ok(views.html.construction.render());
     }
 
     @Security.Authenticated(Securite.class)

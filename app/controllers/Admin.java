@@ -141,14 +141,17 @@ public class Admin extends Controller {
     }
 
     public static Result rifs() {
-        return TODO;
+        // TODO admin rifs
+        return ok(views.html.construction.render());
     }
 
     public static Result simulations() {
-        return TODO;
+        // TODO admin simulations
+        return ok(views.html.construction.render());
     }
 
     public static Result journal() {
-        return TODO;
+        // TODO admin journal
+        return ok(views.html.construction.render());
     }
 }
