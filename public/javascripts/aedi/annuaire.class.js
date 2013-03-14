@@ -150,21 +150,14 @@ Annuaire.chercherContacts = function chercherContacts() {
 	}
 	
 	// Requête Ajax :
-    // TODO recherche contacts
-	var /* objet */ requete = $.ajax({
-		url: "./annuaire/ajax/searchContact.cible.php",
-		type: "POST",
-		data: {keywords : processedKeywords},
-		dataType: "json"
-	});
-
-	requete.done(function(donnees) {
-		Annuaire.afficherResultatRechercheContacts(donnees, processedKeywords);
-	});
-	requete.fail(function(jqXHR, textStatus) {
-		Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
-	});
-
+    jsRoutes.controllers.Aedi.annuaireRechercheContacts(unprocessedKeywords).ajax({
+        success: function(donnees) {
+            Annuaire.afficherResultatRechercheContacts(donnees, processedKeywords);
+        },
+        error: function(jqXHR, textStatus) {
+            Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
+        }
+    });
 };
 
 /**

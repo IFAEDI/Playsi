@@ -1,9 +1,8 @@
 package services;
 
+import com.avaje.ebean.Ebean;
 import controllers.Securite;
-import models.CommentaireEntreprise;
-import models.ContactEntreprise;
-import models.Entreprise;
+import models.*;
 import play.db.ebean.Model;
 
 import java.util.*;
@@ -165,6 +164,123 @@ public class AnnuaireService {
             result.id = nouveauCommentaire.getId(); // TODO vérifier id bien reçu
         }
 
+        return result;
+    }
+
+    public static List<Entreprise> rechercherContacts(String motsclesStr) {
+        // TODO renvoyer au format attendu
+        // TODO faire la recherche par tous les champs
+        // TODO trouve les entreprises qui vérifient les conditions, n'isole pas les contacts.
+
+        String[] motscles = motsclesStr.split(" ");
+        /*
+        Model.Finder<Long, ContactEntreprise> finder = new Model.Finder<Long, ContactEntreprise>(Long.class, ContactEntreprise.class);
+        List<ContactEntreprise> contacts =
+                finder.fetch("entreprise")
+                .where()
+                    .ilike("nom", "%"+motscles[0]+"%")
+                .findList();
+        */
+        Model.Finder<Long, Entreprise> finder = new Model.Finder<Long, Entreprise>(Long.class, Entreprise.class);
+        List<Entreprise> entreprises = finder.fetch("contacts").where().ilike("contacts.nom", "%"+motscles[0]+"%").findList();
+
+        return entreprises;
+    }
+
+    public static class MajContactResult {
+        public Statut statut;
+        public Long nouvelId;
+    }
+
+    public static MajContactResult majContact(ContactEntreprise arguments, Long idEntreprise) {
+        ContactEntreprise contact = null;
+        contact = Ebean.find(ContactEntreprise.class).where().eq("id", arguments.getId()).findUnique();
+        boolean estMiseAJour = contact != null;
+
+        if( estMiseAJour ) {
+            contact.setNom(arguments.getNom());
+            contact.setPrenom(arguments.getPrenom());
+            contact.setCommentaire(arguments.getCommentaire());
+            contact.setFonction(arguments.getFonction());
+            contact.setPriorite(arguments.getPriorite());
+
+            for( Mail m: contact.getMails() ) {
+                m.delete();
+            }
+            for( Telephone t: contact.getTelephones() ) {
+                t.delete();
+            }
+
+            contact.setMails(arguments.getMails());
+            contact.setTelephones(arguments.getTelephones());
+        } else {
+            contact = arguments;
+        }
+
+        Model.Finder<Long, Entreprise> finder = new Model.Finder<Long, Entreprise>(Long.class, Entreprise.class);
+        Entreprise e = finder.byId( idEntreprise );
+        if( e== null) {
+            MajContactResult result = new MajContactResult();
+            result.statut = Statut.ENTREPRISE_NON_TROUVEE;
+            return result;
+        }
+
+        // mise à jour de la ville
+        if( arguments.getVille() != null ) {
+            if( estMiseAJour ) {
+                Ville ancienneVille = contact.getVille();
+                if( ancienneVille == null ) {
+                    ancienneVille = new Ville();
+                }
+
+                boolean modificationVille = false;
+                if( ancienneVille.getCodePostal() == null || !ancienneVille.getCodePostal().equals(arguments.getVille().getCodePostal()) ) {
+                    modificationVille = true;
+                    ancienneVille.setCodePostal(arguments.getVille().getCodePostal());
+                }
+                if( ancienneVille.getLibelle() == null || !ancienneVille.getLibelle().equals(arguments.getVille().getLibelle()) ) {
+                    modificationVille = true;
+                    ancienneVille.setLibelle(arguments.getVille().getLibelle());
+                }
+                if( ancienneVille.getPays() == null || !ancienneVille.getPays().equals(arguments.getVille().getPays()) ) {
+                    modificationVille = true;
+                    ancienneVille.setPays(arguments.getVille().getPays());
+                }
+
+                if( modificationVille ) {
+                    contact.setVille(ancienneVille);
+                }
+            } else {
+                contact.setVille(arguments.getVille());
+            }
+        } else {
+            if( estMiseAJour && contact.getVille() != null ) {
+                Ville aSupprimer = contact.getVille();
+                contact.setVille(null);
+                contact.save();
+                aSupprimer.delete();
+            }
+        }
+
+        if( estMiseAJour ) {
+            contact.save();
+        } else {
+            List<ContactEntreprise> contacts = e.getContacts();
+            if( contacts == null ) {
+                contacts = new ArrayList<ContactEntreprise>();
+            }
+            contacts.add(contact);
+            e.setContacts(contacts);
+            e.save();
+        }
+
+        MajContactResult result = new MajContactResult();
+        result.statut = Statut.OK;
+        if( estMiseAJour ) {
+            result.nouvelId = -1L;
+        } else {
+            result.nouvelId = contact.getId();
+        }
         return result;
     }
 }

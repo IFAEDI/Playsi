@@ -1,13 +1,12 @@
 package controllers;
 
-import com.avaje.ebean.Ebean;
 import controllers.Utils.Constantes;
 import controllers.Utils.JsonUtils;
 import models.*;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
-import play.db.ebean.Model;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -180,12 +179,96 @@ public class Aedi extends Controller {
     }
 
     @Security.Authenticated(SecuriteAPI.class)
-    public static Result annuaireRechercheContacts(String motscles) {
+    public static Result annuaireRechercheContacts(String motsclesStr) {
         if( !utilisateurEstAuthorise() ) {
             return unauthorized();
         }
-        // TODO
-        return TODO;
+
+        List<Entreprise> entreprises = AnnuaireService.rechercherContacts(motsclesStr);
+
+        ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Résultats trouvés.");
+        ArrayNode ejson = new ArrayNode(JsonNodeFactory.instance);
+        for( Entreprise e: entreprises ) {
+            ejson.add(e.toJson());
+        }
+        json.put("entreprises", ejson);
+
+        return ok(json);
+    }
+
+    private static ContactEntreprise reconstruireCorpsContact(JsonNode root) {
+
+        if( !root.has("id_contact") || !root.has("personne")
+                || !root.get("personne").has("prenom")
+                || !root.get("personne").has("nom")
+                || !root.has("fonction") ) {
+            return null;
+        }
+
+        // TODO constantes json
+        Long idContact = root.get("id_contact").asLong();
+        String fonction = root.get("fonction").asText();
+        String commentaire = root.get("commentaire").asText();
+        Integer priorite = root.get("priorite").asInt();
+
+        // TODO factoriser récupération personne
+        ObjectNode personne = (ObjectNode) root.get("personne");
+        String nomPersonne = personne.get("nom").asText();
+        String prenomPersonne = personne.get("prenom").asText();
+
+        List<Mail> mails = new ArrayList<Mail>();
+        // Reconstruction des emails
+        for( JsonNode jn : (ArrayNode) personne.get(Constantes.JSON_MAILS) ) {
+            ObjectNode on = (ObjectNode) jn;
+            if( !on.has(Constantes.JSON_EMAIL) ) {
+                // un objet "email" en json doit avoir au moins la clé "email"
+                return null;
+            }
+            Mail m = new Mail(on);
+            // ajoute l'email seulement s'il est rempli (non vide)
+            if( !m.getEmail().isEmpty() ) {
+                mails.add(m);
+            }
+        }
+
+        // idem que reconstruction emails
+        List<Telephone> tels = new ArrayList<Telephone>();
+        for( JsonNode jn : (ArrayNode) personne.get(Constantes.JSON_TELEPHONES) ) {
+            ObjectNode on = (ObjectNode) jn;
+            if( !on.has(Constantes.JSON_NUMERO) ) {
+                return null;
+            }
+            Telephone t = new Telephone(on);
+            if( !t.getNumero().isEmpty() ) {
+                tels.add(t);
+            }
+        }
+
+        ObjectNode villeJson = (ObjectNode) root.get("ville");
+        String codePostal = villeJson.get("code_postal").asText();
+        String libelle = villeJson.get("libelle").asText();
+        String pays = villeJson.get("pays").asText();
+
+        ContactEntreprise nouveau = new ContactEntreprise();
+
+        if( !codePostal.isEmpty() || !libelle.isEmpty() || !pays.isEmpty() ) {
+            Ville ville = new Ville();
+            ville.setCodePostal(codePostal);
+            ville.setLibelle(libelle);
+            ville.setPays(pays);
+            nouveau.setVille(ville);
+        }
+
+        nouveau.setCommentaire(commentaire);
+        nouveau.setFonction(fonction);
+        nouveau.setId(idContact);
+        nouveau.setPriorite(priorite);
+        nouveau.setMails(mails);
+        nouveau.setTelephones(tels);
+        nouveau.setNom(nomPersonne);
+        nouveau.setPrenom(prenomPersonne);
+
+        return nouveau;
     }
 
     @Security.Authenticated(SecuriteAPI.class)
@@ -217,147 +300,27 @@ public class Aedi extends Controller {
         };
          */
 
-        // TODO gérer arguments manquants
-
+        // 1) reconstruction de la requête
         JsonNode root = request().body().asJson();
-        // TODO constantes json
-        Long idContact = root.get("id_contact").asLong();
         Long idEntreprise = root.get("id_entreprise").asLong();
-        String fonction = root.get("fonction").asText();
-        String commentaire = root.get("commentaire").asText();
-        Integer priorite = root.get("priorite").asInt();
-
-        ObjectNode personne = (ObjectNode) root.get("personne");
-
-        // TODO factoriser récupération personne
-        String nomPersonne = personne.get("nom").asText();
-        String prenomPersonne = personne.get("prenom").asText();
-
-        ContactEntreprise nouvellePersonne = null;
-        nouvellePersonne = Ebean.find(ContactEntreprise.class).where().eq("id", idContact).findUnique();
-        boolean estMiseAJour = nouvellePersonne != null;
-        if( !estMiseAJour ) {
-            nouvellePersonne = new ContactEntreprise();
+        ContactEntreprise nouveau = reconstruireCorpsContact(root);
+        if( nouveau == null ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Arguments manquants"));
         }
 
-        for( Mail m: nouvellePersonne.getMails() ) {
-            m.delete();
-        }
-        for( Telephone t: nouvellePersonne.getTelephones() ) {
-            t.delete();
-        }
-
-        List<Mail> mails = new ArrayList<Mail>();
-        // Reconstruction des emails: récupérer
-        for( JsonNode jn : (ArrayNode) personne.get(Constantes.JSON_MAILS) ) {
-            ObjectNode on = (ObjectNode) jn;
-            if( !on.has(Constantes.JSON_EMAIL) ) {
-                // un objet "email" en json doit avoir au moins la clé "email"
-                return null;
-            }
-            Mail m = new Mail(on);
-            // ajoute l'email seulement s'il est rempli (non vide)
-            if( !m.getEmail().isEmpty() ) {
-                mails.add(m);
-            }
-        }
-
-        // idem que reconstruction emails
-        List<Telephone> tels = new ArrayList<Telephone>();
-        for( JsonNode jn : (ArrayNode) personne.get(Constantes.JSON_TELEPHONES) ) {
-            ObjectNode on = (ObjectNode) jn;
-            if( !on.has(Constantes.JSON_NUMERO) ) {
-                return null;
-            }
-            Telephone t = new Telephone(on);
-            if( !t.getNumero().isEmpty() ) {
-                tels.add(t);
-            }
-        }
-
-        Model.Finder<Long, Entreprise> finder = new Model.Finder<Long, Entreprise>(Long.class, Entreprise.class);
-        Entreprise e = finder.byId( idEntreprise ); // TODO gérer entreprise non présente en bdd
-
-        // TODO service
-
-        nouvellePersonne.setId(idContact);
-        nouvellePersonne.setMails(mails);
-        nouvellePersonne.setTelephones(tels);
-        nouvellePersonne.setNom(nomPersonne);
-        nouvellePersonne.setPrenom(prenomPersonne);
-
-        nouvellePersonne.setCommentaire(commentaire);
-        nouvellePersonne.setFonction(fonction);
-        nouvellePersonne.setPriorite(priorite);
-
-        ObjectNode ville = (ObjectNode) root.get("ville");
-        String codePostal = ville.get("code_postal").asText();
-        String libelle = ville.get("libelle").asText();
-        String pays = ville.get("pays").asText();
-
-        // mise à jour de la ville
-        if( !codePostal.isEmpty() || !libelle.isEmpty() || !pays.isEmpty() ) {
-            if( estMiseAJour ) {
-                Ville ancienneVille = nouvellePersonne.getVille();
-                if( ancienneVille == null ) {
-                    ancienneVille = new Ville();
-                }
-
-                boolean modificationVille = false;
-                if( ancienneVille.getCodePostal() == null || !ancienneVille.getCodePostal().equals(codePostal) ) {
-                    modificationVille = true;
-                    ancienneVille.setCodePostal(codePostal);
-                }
-                if( ancienneVille.getLibelle() == null || !ancienneVille.getLibelle().equals(libelle) ) {
-                    modificationVille = true;
-                    ancienneVille.setLibelle(libelle);
-                }
-                if( ancienneVille.getPays() == null || !ancienneVille.getPays().equals(pays) ) {
-                    modificationVille = true;
-                    ancienneVille.setPays(pays);
-                }
-
-                if( modificationVille ) {
-                    nouvellePersonne.setVille(ancienneVille);
-                }
-            } else {
-                Ville nouvelleVille = new Ville();
-                nouvelleVille.setCodePostal(codePostal);
-                nouvelleVille.setLibelle(libelle);
-                nouvelleVille.setPays(pays);
-                nouvellePersonne.setVille(nouvelleVille);
-            }
+        AnnuaireService.MajContactResult result = AnnuaireService.majContact(nouveau, idEntreprise);
+        if( result.statut == AnnuaireService.Statut.OK ) {
+            ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Création effectuée");
+            json.put("id", result.nouvelId);
+            json.put("id_personne", result.nouvelId); // TODO id_personne utilisé?
+            return ok(json);
+        } else if( result.statut == AnnuaireService.Statut.ENTREPRISE_NON_TROUVEE ) {
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Entreprise non trouvée."));
         } else {
-            if( estMiseAJour && nouvellePersonne.getVille() != null ) {
-                Ville aSupprimer = nouvellePersonne.getVille();
-                nouvellePersonne.setVille(null);
-                nouvellePersonne.save();
-                aSupprimer.delete();
-            }
+            return ok(JsonUtils.genererReponseJson(JsonUtils.JsonStatut.ERREUR, "Statut inconnu."));
         }
-
-        if( estMiseAJour ) {
-            nouvellePersonne.save();
-        } else {
-            List<ContactEntreprise> contacts = e.getContacts();
-            if( contacts == null ) {
-                contacts = new ArrayList<ContactEntreprise>();
-            }
-            contacts.add(nouvellePersonne);
-            e.setContacts(contacts);
-            e.save();
-        }
-
-        ObjectNode json = JsonUtils.genererReponseJson(JsonUtils.JsonStatut.OK, "Création effectuée");
-        if( estMiseAJour ) {
-            json.put("id", -1);
-        } else {
-            json.put("id", nouvellePersonne.getId()); // TODO vérifier ça
-        }
-        json.put("id_personne", nouvellePersonne.getId());
 
         // attendu: {id, id_personne, statut}
-        return ok(json);
     }
 
     @Security.Authenticated(SecuriteAPI.class)
