@@ -96,23 +96,3 @@ create index ix_telephone_proprietaire_6 on telephone (proprietaire_id);
 
 
 
-# --- !Downs
-
-SET FOREIGN_KEY_CHECKS=0;
-
-drop table commentaire_entreprise;
-
-drop table entreprise;
-
-drop table mail;
-
-drop table personne;
-
-drop table stage;
-
-drop table telephone;
-
-drop table ville;
-
-SET FOREIGN_KEY_CHECKS=1;
-
