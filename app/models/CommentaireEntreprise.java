@@ -6,6 +6,7 @@ import play.libs.Json;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.util.Date;
 
 /**
@@ -27,6 +28,7 @@ public class CommentaireEntreprise extends Model{
 
     private Integer categorie;
 
+    @ManyToOne
     private Utilisateur auteur;
 
     public ObjectNode toJson() {

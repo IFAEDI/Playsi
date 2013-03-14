@@ -25,7 +25,7 @@ POST    /admin/users/del            controllers.Admin.supprimerUtilisateur(id: L
 GET     /admin/annuaire                 controllers.Aedi.annuaire()
 GET     /admin/annuaire/corp/name/      controllers.Aedi.annuaireExisteEntreprise(nom: String)
 GET     /admin/annuaire/corp/:id        controllers.Aedi.annuaireInfosEntreprise(id: Long)
-POST    /admin/annuaire/corp/:id        controllers.Aedi.annuaireMajEntreprise(id: Long, nom: String, secteur: String, description: String, commentaire: String)
+POST    /admin/annuaire/corp/:id        controllers.Aedi.annuaireMajEntreprise(id: Long, nom: String, secteur: String, description: String)
 POST    /admin/annuaire/corp/:id/del    controllers.Aedi.annuaireSupprimerEntreprise(id: Long)
 POST    /admin/annuaire/comm/           controllers.Aedi.annuaireNouveauCommentaire(id: Long, contenu: String, categorie: Int)
 POST    /admin/annuaire/comm/:id/del    controllers.Aedi.annuaireSupprimerCommentaire(id: Long)

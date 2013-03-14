@@ -4,8 +4,7 @@ import com.avaje.ebean.validation.Length;
 import org.codehaus.jackson.node.ObjectNode;
 import play.libs.Json;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,10 +14,8 @@ import javax.persistence.Id;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
+@DiscriminatorValue("2")
 public class ContactEntreprise extends Personne {
-
-    @Id
-    private Long id;
 
     @Length(max=35)
     private String fonction;
@@ -27,7 +24,11 @@ public class ContactEntreprise extends Personne {
 
     private String commentaire;
 
+    @OneToOne(cascade = CascadeType.ALL)
     private Ville ville;
+
+    @ManyToOne
+    private Entreprise entreprise;
 
     public ObjectNode toJson() {
         ObjectNode json = Json.newObject();
@@ -35,11 +36,13 @@ public class ContactEntreprise extends Personne {
         // TODO constantes JSON
         json.put("id_contact", id);
 
-        ObjectNode personne = super.toJson();
-        personne = super.jsonAjouterTelMails(json);
-        json.put("personne", personne);
+        ObjectNode personneJson = super.toJson();
+        personneJson = super.jsonAjouterTelMails(personneJson);
+        json.put("personne", personneJson);
 
-        json.put("ville", ville.toJson());
+        if( ville != null ) {
+            json.put("ville", ville.toJson());
+        }
         json.put("commentaire", commentaire);
         json.put("fonction", fonction);
         json.put("priorite", priorite);
@@ -86,5 +89,13 @@ public class ContactEntreprise extends Personne {
 
     public void setVille(Ville ville) {
         this.ville = ville;
+    }
+
+    public Entreprise getEntreprise() {
+        return entreprise;
+    }
+
+    public void setEntreprise(Entreprise entreprise) {
+        this.entreprise = entreprise;
     }
 }

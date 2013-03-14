@@ -94,7 +94,7 @@ Annuaire.Colors = {
  */
 Annuaire.chercherInfoEntreprise = function chercherInfoEntreprise(/* int */ idEntreprise, /* void function(void) */ callback ) {
 	// Requête Ajax :
-    jsRoutes.controllers.Aedi.infosEnterprise(idEntreprise).ajax({
+    jsRoutes.controllers.Aedi.annuaireInfosEntreprise(idEntreprise).ajax({
        success: callback,
        error: function(jqXHR, textStatus) {
            Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
@@ -150,6 +150,7 @@ Annuaire.chercherContacts = function chercherContacts() {
 	}
 	
 	// Requête Ajax :
+    // TODO recherche contacts
 	var /* objet */ requete = $.ajax({
 		url: "./annuaire/ajax/searchContact.cible.php",
 		type: "POST",
@@ -171,24 +172,19 @@ Annuaire.chercherContacts = function chercherContacts() {
  * id_entreprise : L'id de l'entreprise à supprimer
  */
 Annuaire.supprimerEntreprise = function supprimerEntreprise(id_entreprise) {
-	$.ajax( {
-		url: "./annuaire/ajax/supprEntreprise.cible.php",
-		type: "POST",
-		async: false,
-		data: { "id_entreprise" : id_entreprise },
-		dataType: "json",
-		success : function(resp) {
-			if( resp.code == 'ok' ) {
-				window.location.reload();
-			}
-			else {
-				Annuaire.afficherErreur( resp.mesg );
-			}
-		},
-		error :  function(jqXHR, textStatus) {
-			Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
-		}
-	} );
+    jsRoutes.controllers.Aedi.annuaireSupprimerEntreprise(id_entreprise).ajax({
+        success : function(resp) {
+            if( resp.statut == 'ok' ) {
+                window.location.reload();
+            }
+            else {
+                Annuaire.afficherErreur( resp.mesg );
+            }
+        },
+        error :  function(jqXHR, textStatus) {
+            Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
+        }
+    });
 };
 
 /** 
@@ -204,18 +200,63 @@ Annuaire.updaterEntreprise = function updaterEntreprise() {
 	var /* string */ nomEntr = $('#formUpdateEntrepriseNom').val();
 		
 	/* int */ var idEntrepriseActuelle = -1
-	if ($('#formUpdateEntrepriseId').val() != "0") {
+	if ($('#formUpdateEntrepriseId').val() != "-1") {
 		idEntrepriseActuelle = Annuaire.infoEntrepriseCourante.description.id_entreprise;
 	}
 	
 	// Envoi :
-	var description = {id_entreprise: parseInt($('#formUpdateEntrepriseId').val()), nom : encodeURIComponent(nomEntr), secteur: encodeURIComponent($('#formUpdateEntrepriseSecteur').val()), description: encodeURIComponent($('#formUpdateEntrepriseDescription').val())};
-	var /* objet */ requete = $.ajax({
-		url: "./annuaire/ajax/updateEntreprise.cible.php",
-		type: "POST",
-		data: description,
-		dataType: "json"
-	});
+    var description = {
+        id_entreprise: parseInt($('#formUpdateEntrepriseId').val()),
+        nom: nomEntr,
+        secteur: $('#formUpdateEntrepriseSecteur').val(),
+        description: $('#formUpdateEntrepriseDescription').val()
+    }; // TODO renommer description en entreprise
+
+    jsRoutes.controllers.Aedi.annuaireMajEntreprise(description.id_entreprise, description.nom, description.secteur, description.description).ajax({
+        success: function(donnees) {
+            if (donnees.statut == "ok") {
+                if (donnees.id >= 0) { // Ajout d'une entreprise :
+                    Annuaire.insererEntrepriseDansListe({id_entreprise: donnees.id, nom: nomEntr});
+                    Annuaire.afficherListeEntreprises();
+                    container = {'description' : description};
+                    Annuaire.infoEntrepriseCourante = container;
+                    var objSimulantReponseServeur = { statut: "ok", entreprise: Annuaire.infoEntrepriseCourante};
+                    Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
+                    // On demande si l'utilisateur veut ajouter tout de suite des contacts :
+                    Annuaire.confirmerAction('Entreprise ajoutée !<br/> Voulez-vous ajouter des contacts tout de suite ?', 'alert-success', function(id) {
+                        $('#formUpdateContactEntrepriseId').val(id);
+                        $('#modalUpdateContact').modal('show');
+                    }, donnees.id);
+                }
+                else if (donnees.id == -1) { // Edition d'une entreprise :
+                    Annuaire.confirmerAction('Entreprise éditée !<br/> Voulez-vous également ajouter de nouveaux contacts ?', 'alert-success', function(id) {
+                        $('#formUpdateContactEntrepriseId').val(id);
+                        $('#modalUpdateContact').modal('show');
+                    }, Annuaire.infoEntrepriseCourante.description.id_entreprise);
+
+                    if (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise) {
+                        Annuaire.infoEntrepriseCourante.description = description;
+                        var objSimulantReponseServeur = { statut: "ok", entreprise : Annuaire.infoEntrepriseCourante};
+                        Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
+                    }
+                    // Si MAJ du nom, ca met à jour la liste ...
+                    Annuaire.retirerEntrepriseDeListe(description.id_entreprise);
+                    Annuaire.insererEntrepriseDansListe({id_entreprise: description.id_entreprise, nom: nomEntr});
+                    Annuaire.afficherListeEntreprises(); // Si MAJ du nom, ca met à jour la liste ...
+                }
+                else {
+                    Annuaire.afficherErreur('Une erreur est survenue (id = '+donnees.id+')' );
+                }
+            }
+            else {
+                Annuaire.afficherErreur( donnees.mesg );
+            }
+        },
+
+        error: function(jqXHR, textStatus) {
+            Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
+        }
+    });
 	
 	// Ajout du secteur à la liste si nouveau.
 	if ($.inArray($('#formUpdateEntrepriseSecteur').val(), Annuaire.listeSecteurs) == -1) {
@@ -229,56 +270,7 @@ Annuaire.updaterEntreprise = function updaterEntreprise() {
 	$('#modalUpdateEntreprise').modal('hide');
 	resetForm($('#formUpdateEntreprise'));
 	$('#formUpdateEntrepriseDescription').val('');
-	$('#formUpdateEntrepriseId').val(0);
-
-	requete.done(function(donnees) {
-		if (donnees.code == "ok") {
-			if (donnees.id > 0) { // Ajout d'une entreprise :
-				Annuaire.insererEntrepriseDansListe({id_entreprise: donnees.id, nom: nomEntr});
-				Annuaire.afficherListeEntreprises();
-				description.nom = decodeURIComponent(description.nom );
-				description.secteur = decodeURIComponent(description.secteur );
-				description.description = decodeURIComponent(description.description );
-				container = {'description' : description};
-				Annuaire.infoEntrepriseCourante = container;
-				var objSimulantReponseServeur = { entreprise : Annuaire.infoEntrepriseCourante};
-				Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
-				// On demande si l'utilisateur veut ajouter tout de suite des contacts :
-				Annuaire.confirmerAction('Entreprise ajoutée !<br/> Voulez-vous ajouter des contacts tout de suite ?', 'alert-success', function(id) {
-					$('#formUpdateContactEntrepriseId').val(id);
-					$('#modalUpdateContact').modal('show');
-				}, donnees.id);
-			}
-			else if (donnees.id == 0) { // Edition d'une entreprise :
-				Annuaire.confirmerAction('Entreprise éditée !<br/> Voulez-vous également ajouter de nouveaux contacts ?', 'alert-success', function(id) {
-					$('#formUpdateContactEntrepriseId').val(id);
-					$('#modalUpdateContact').modal('show');
-				}, Annuaire.infoEntrepriseCourante.description.id_entreprise);
-				
-				if (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise) {
-					description.nom = decodeURIComponent(description.nom );
-					description.secteur = decodeURIComponent(description.secteur );
-					description.description = decodeURIComponent(description.description );
-					Annuaire.infoEntrepriseCourante.description = description;
-					var objSimulantReponseServeur = { entreprise : Annuaire.infoEntrepriseCourante};
-					Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
-				}
-				// Si MAJ du nom, ca met à jour la liste ...
-				Annuaire.retirerEntrepriseDeListe(description.id_entreprise);
-				Annuaire.insererEntrepriseDansListe({id_entreprise: description.id_entreprise, nom: nomEntr});
-				Annuaire.afficherListeEntreprises(); // Si MAJ du nom, ca met à jour la liste ...
-			}
-			else {
-				Annuaire.afficherErreur('Une erreur est survenue (id = '+donnees.id+')' );
-			}
-		}
-		else {
-			Annuaire.afficherErreur( donnees.mesg );
-		}
-	});
-	requete.fail(function(jqXHR, textStatus) {
-		Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
-	});
+	$('#formUpdateEntrepriseId').val(-1);
 };
 
 /** 
@@ -295,41 +287,60 @@ Annuaire.updaterContact = function updaterContact() {
 	
 	// Récupération de données complexes :
 	var /* array */ tels = [];
+    // TODO objet tel à mettre en commun + mail
 	$('#formUpdateContactTelGroup ul').children().each(function(){
-		tels.push([$(this).find('.labelVal').attr('title'), $(this).find('.val').text()]);
+		tels.push({
+            intitule: $(this).find('.labelVal').attr('title'),
+            numero: $(this).find('.val').text()
+        });
 	});
-	if ($('#formUpdateContactTel').val() != '') { tels.push([encodeURIComponent($('#formUpdateContactTelLabel option:selected').val()), encodeURIComponent($('#formUpdateContactTel').val())]); }
+	if ($('#formUpdateContactTel').val() != '') {
+        tels.push({
+            intitule: $('#formUpdateContactTelLabel option:selected').val(),
+            numero: $('#formUpdateContactTel').val()
+        });
+    }
 	
 	var /* array */ emails = [];
 	$('#formUpdateContactEmailGroup ul').children().each(function(){
-		emails.push([$(this).find('.labelVal').attr('title'), $(this).find('.val').text()]);
-	});
-	if ($('#formUpdateContactEmail').val() != '') { emails.push([encodeURIComponent($('#formUpdateContactEmailLabel option:selected').val()), encodeURIComponent($('#formUpdateContactEmail').val())]); }
+		emails.push({
+            intitule: $(this).find('.labelVal').attr('title'),
+            email: $(this).find('.val').text()
+        });
+    });
+	if ($('#formUpdateContactEmail').val() != '') {
+        emails.push({
+            intitule: $('#formUpdateContactEmailLabel option:selected').val(),
+            email: $('#formUpdateContactEmail').val()
+        });
+    }
 	
 	// Envoi :
 	var /* objet */ nouveauContact = {
 		id_contact: parseInt($('#formUpdateContactId').val()),
 		id_entreprise: parseInt($('#formUpdateContactEntrepriseId').val()),
-		fonction : encodeURIComponent($('#formUpdateContactPoste').val()),
+		fonction : $('#formUpdateContactPoste').val(),
 		personne : {
 			id : parseInt($('#formUpdateContactPersonneId').val()),
-			nom : encodeURIComponent($('#formUpdateContactNom').val()),
-			prenom : encodeURIComponent($('#formUpdateContactPrenom').val()),
+			nom : $('#formUpdateContactNom').val(),
+			prenom : $('#formUpdateContactPrenom').val(),
 			mails : emails,
 			telephones : tels
 		},
 		ville : {
-			code_postal : encodeURIComponent($('#formUpdateContactVilleCodePostal').val()),
-			libelle : encodeURIComponent($('#formUpdateContactVilleLibelle').val()),
-			pays : encodeURIComponent($('#formUpdateContactVillePays').val())
+			code_postal : $('#formUpdateContactVilleCodePostal').val(),
+			libelle : $('#formUpdateContactVilleLibelle').val(),
+			pays : $('#formUpdateContactVillePays').val()
 		},
-		commentaire : encodeURIComponent($('#formUpdateContactCom').val()),
+		commentaire : $('#formUpdateContactCom').val(),
 		priorite : parseInt($('#formUpdateContactPriorite').val())
 	};
+
 	var /* objet */ requete = $.ajax({
-		url: "./annuaire/ajax/updateContact.cible.php",
+        contentType: "application/json",
+		url: "/admin/annuaire/contact/",
 		type: "POST",
-		data: nouveauContact,
+		data: JSON.stringify(nouveauContact),
 		dataType: "json"
 	});
 	
@@ -345,30 +356,15 @@ Annuaire.updaterContact = function updaterContact() {
 	Annuaire.resetFormContact();
 
 	requete.done(function(donnees) {
-		if (donnees.code == "ok") {
+		if (donnees.statut == "ok") {
 			var idNouvContact = parseInt(donnees.id);
-			if ((idNouvContact >= 0) && (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise)) { // Si l'utilisateur est toujours sur la même entreprise, on met à jour son affichage :
+			if ((idNouvContact >= -1) && (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise)) { // Si l'utilisateur est toujours sur la même entreprise, on met à jour son affichage :
 			
 				nouveauContact.personne.id = donnees.id_personne;
 				if (typeof Annuaire.infoEntrepriseCourante.contacts === "undefined") { Annuaire.infoEntrepriseCourante.contacts = []; }					
-				nouveauContact.fonction = decodeURIComponent(nouveauContact.fonction);
-				nouveauContact.personne.nom = decodeURIComponent(nouveauContact.personne.nom);
-				nouveauContact.personne.prenom = decodeURIComponent(nouveauContact.personne.prenom);
-				for (var i in nouveauContact.personne.mails) {
-					nouveauContact.personne.mails[i][0] = decodeURIComponent(nouveauContact.personne.mails[i][0]);
-					nouveauContact.personne.mails[i][1] = decodeURIComponent(nouveauContact.personne.mails[i][1]);
-				}
-				for (var i in nouveauContact.personne.telephones) {
-					nouveauContact.personne.telephones[i][0] = decodeURIComponent(nouveauContact.personne.telephones[i][0]);
-					nouveauContact.personne.telephones[i][1] = decodeURIComponent(nouveauContact.personne.telephones[i][1]);
-				}
-				nouveauContact.ville.code_postal = decodeURIComponent(nouveauContact.ville.code_postal);
-				nouveauContact.ville.libelle = decodeURIComponent(nouveauContact.ville.libelle);
-				nouveauContact.ville.pays = decodeURIComponent(nouveauContact.ville.pays);
-				nouveauContact.commentaire = decodeURIComponent(nouveauContact.commentaire);
 
 				// On met à jour l'ancien contact ou ajoute le nouveau :
-				if (idNouvContact == 0) {
+				if (idNouvContact == -1) {
 					for (var i in Annuaire.infoEntrepriseCourante.contacts) {
 						if (Annuaire.infoEntrepriseCourante.contacts[i].id_contact == nouveauContact.id_contact) {
 							Annuaire.infoEntrepriseCourante.contacts[i] = nouveauContact;
@@ -382,19 +378,19 @@ Annuaire.updaterContact = function updaterContact() {
 					Annuaire.infoEntrepriseCourante.contacts.push(nouveauContact);
 				}
 
-				var objSimulantReponseServeur = { entreprise : Annuaire.infoEntrepriseCourante};
+				var objSimulantReponseServeur = { statut: "ok", entreprise : Annuaire.infoEntrepriseCourante};
 				Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
 			}
 			
-			if (donnees.id > 0) { // Ajout d'un contact :
+			if (donnees.id >= 0) { // Ajout d'un contact :
 				// On demande si l'utilisateur veut en ajouter tout de suite d'autres :
 				Annuaire.confirmerAction('Contact ajouté !<br/> Voulez-vous en ajouter d\'autres tout de suite ?', 'alert-success', function(id) {
 					$('#formUpdateContactEntrepriseId').val(id);
 					$('#modalUpdateContact').modal('show');
 				}, donnees.id);
 			}
-			else if (donnees.id == 0) { // Edition d'un contact :
-			
+			else if (donnees.id == -1) { // Edition d'un contact :
+			    // TODO LOL EMPTY
 			}
 			else {
 				Annuaire.afficherErreur('Contact - Une erreur est survenue (id = '+donnees.id+')' );
@@ -423,52 +419,54 @@ Annuaire.ajouterCommentaire = function ajouterCommentaire() {
 	
 	// Envoi :
 	var categorie = $('#formAjoutCommentaire .formAjoutCommentaireCateg:checked');
-	var /* objet */ nouveauCommentaire = {
-		'id_entreprise': idEntrepriseActuelle,
-		'contenu' : encodeURIComponent($('#formAjoutCommentaireContenu').val()),
-		'categorie' : parseInt(categorie.val())
-	};
-	var /* objet */ requete = $.ajax({
-		url: "./annuaire/ajax/ajoutCommentaire.cible.php",
-		type: "POST",
-		data: nouveauCommentaire,
-		dataType: "json"
-	});
+
+    id_entreprise= idEntrepriseActuelle,
+    contenu= $('#formAjoutCommentaireContenu').val(),
+    categorie= parseInt(categorie.val());
+
+    nouveauCommentaire = {
+        id_entreprise: id_entreprise,
+        contenu: contenu,
+        categorie: categorie
+    }
+
+    jsRoutes.controllers.Aedi.annuaireNouveauCommentaire( id_entreprise, contenu, categorie).ajax({
+     success: function(donnees) {
+         if (donnees.statut == "ok") {
+             if (donnees.id >= 0) {
+                 if (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise) { // Si l'utilisateur est toujours sur la même entreprise, on met à jour son affichage :
+                     nouveauCommentaire.id_commentaire = donnees.id;
+                     if (typeof Annuaire.infoEntrepriseCourante.commentaires === "undefined") { Annuaire.infoEntrepriseCourante.commentaires = []; }
+                     nouveauCommentaire.personne = donnees.personne;
+                     nouveauCommentaire.timestamp = new Date(); // TODO récupérer la date depuis le serveur
+                     nouveauCommentaire.timestamp = nouveauCommentaire.timestamp.format('yyyy-mm-dd hh:mm:ss');
+                     Annuaire.infoEntrepriseCourante.commentaires.push(nouveauCommentaire);
+                     var objSimulantReponseServeur = { statut: "ok", entreprise : Annuaire.infoEntrepriseCourante };
+                     Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
+                     $('#contacts').collapse('hide');
+                     $('#remarques').collapse('show');
+                 }
+             }
+             else {
+                 Annuaire.afficherErreur('Commentaire : Une erreur est survenue (id = '+donnees.id+')' );
+             }
+         }
+         else {
+             Annuaire.afficherErreur( donnees.mesg );
+         }
+     },
+
+        error: function(jqXHR, textStatus) {
+            Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
+        }
+
+    });
 	
 	// RAZ du form :
 	$('#modalAjoutCommentaire').modal('hide');
 	resetForm($('#formAjoutCommentaire'));
 	$('#formAjoutCommentaireContenu').val('');
 	$('#formAjoutCommentaireCategorie1').attr('checked', true);
-
-	requete.done(function(donnees) {
-		if (donnees.code == "ok") {
-			if (donnees.id >= 0) {
-				if (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise) { // Si l'utilisateur est toujours sur la même entreprise, on met à jour son affichage :
-					nouveauCommentaire.id_commentaire = donnees.id;
-					if (typeof Annuaire.infoEntrepriseCourante.commentaires === "undefined") { Annuaire.infoEntrepriseCourante.commentaires = []; }
-					nouveauCommentaire.contenu = decodeURIComponent(nouveauCommentaire.contenu);
-					nouveauCommentaire.personne = Annuaire.utilisateur.personne;
-					nouveauCommentaire.timestamp = new Date();
-					nouveauCommentaire.timestamp = nouveauCommentaire.timestamp.format('yyyy-mm-dd hh:mm:ss');
-					Annuaire.infoEntrepriseCourante.commentaires.push(nouveauCommentaire);
-					var objSimulantReponseServeur = { entreprise : Annuaire.infoEntrepriseCourante};
-					Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
-					$('#contacts').collapse('hide');
-					$('#remarques').collapse('show');
-				}
-			}
-			else {
-				Annuaire.afficherErreur('Commentaire : Une erreur est survenue (id = '+donnees.id+')' );
-			}
-		}
-		else {
-			Annuaire.afficherErreur( donnees.mesg );
-		}
-	});
-	requete.fail(function(jqXHR, textStatus) {
-		Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
-	});
 
 };
 
@@ -484,34 +482,30 @@ Annuaire.supprimerContact = function supprimerContact(id) {
 	/* int */ var idEntrepriseActuelle = Annuaire.infoEntrepriseCourante.description.id_entreprise;
 	
 	// Envoi :
-	var /* objet */ requete = $.ajax({
-		url: "./annuaire/ajax/supprContact.cible.php",
-		type: "POST",
-		data: { id: parseInt(id) },
-		dataType: "json"
-	});
+    jsRoutes.controllers.Aedi.annuaireSupprimerContact(id).ajax({
+        success: function(donnees) {
+            if (donnees.statut == "ok") {
+                if (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise) { // Si l'utilisateur est toujours sur la même entreprise, on met à jour son affichage :
+                    for (var i in Annuaire.infoEntrepriseCourante.contacts) {
+                        if (Annuaire.infoEntrepriseCourante.contacts[i].id_contact == id) {
+                            Annuaire.infoEntrepriseCourante.contacts.splice(i,1);
+                            var objSimulantReponseServeur = { statut:"ok", entreprise : Annuaire.infoEntrepriseCourante};
+                            Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                Annuaire.afficherErreur( donnees.mesg );
+            }
+        },
 
-	requete.done(function(donnees) {
-		if (donnees.code == "ok") {
-			if (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise) { // Si l'utilisateur est toujours sur la même entreprise, on met à jour son affichage :
-				for (var i in Annuaire.infoEntrepriseCourante.contacts) {
-					if (Annuaire.infoEntrepriseCourante.contacts[i].id_contact == id) {
-						Annuaire.infoEntrepriseCourante.contacts.splice(i,1);
-						var objSimulantReponseServeur = { entreprise : Annuaire.infoEntrepriseCourante};
-						Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
-						break;
-					}
-				}
-			}
-		}
-		else {
-			Annuaire.afficherErreur( donnees.mesg );
-		}
-	});
-	requete.fail(function(jqXHR, textStatus) {
-		Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
-	});
+        error: function(jqXHR, textStatus) {
+        Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
+        }
 
+    });
 };
 
 /** 
@@ -524,38 +518,32 @@ Annuaire.supprimerContact = function supprimerContact(id) {
  */
 Annuaire.supprimerCommentaire = function supprimerCommentaire(id) {
 	/* int */ var idEntrepriseActuelle = Annuaire.infoEntrepriseCourante.description.id_entreprise;
-	
-	// Envoi :
-	var /* objet */ requete = $.ajax({
-		url: "./annuaire/ajax/supprCommentaire.cible.php",
-		type: "POST",
-		data: { id: parseInt(id) },
-		dataType: "json"
-	});
 
-	requete.done(function(donnees) {
-		if (donnees.code == "ok") {
-			if (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise) { // Si l'utilisateur est toujours sur la même entreprise, on met à jour son affichage :
-				for (var i in Annuaire.infoEntrepriseCourante.commentaires) {
-					if (Annuaire.infoEntrepriseCourante.commentaires[i].id_commentaire == id) {
-						Annuaire.infoEntrepriseCourante.commentaires.splice(i,1);
-						var objSimulantReponseServeur = { entreprise : Annuaire.infoEntrepriseCourante};
-						Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
-						$('#contacts').collapse('hide');
-						$('#remarques').collapse('show');
-						break;
-					}
-				}
-			}
-		}
-		else {
-			Annuaire.afficherErreur( donnees.mesg );
-		}
-	});
-	requete.fail(function(jqXHR, textStatus) {
-		Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
-	});
-
+    jsRoutes.controllers.Aedi.annuaireSupprimerCommentaire(parseInt(id)).ajax({
+        success:
+            function(donnees) {
+                if (donnees.statut == "ok") {
+                    if (idEntrepriseActuelle == Annuaire.infoEntrepriseCourante.description.id_entreprise) { // Si l'utilisateur est toujours sur la même entreprise, on met à jour son affichage :
+                        for (var i in Annuaire.infoEntrepriseCourante.commentaires) {
+                            if (Annuaire.infoEntrepriseCourante.commentaires[i].id_commentaire == id) {
+                                Annuaire.infoEntrepriseCourante.commentaires.splice(i,1);
+                                var objSimulantReponseServeur = { statut:"ok",entreprise : Annuaire.infoEntrepriseCourante};
+                                Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
+                                $('#contacts').collapse('hide');
+                                $('#remarques').collapse('show');
+                                break;
+                            }
+                        }
+                    }
+                }
+                else {
+                    Annuaire.afficherErreur( donnees.mesg );
+                }
+            },
+        error: function(jqXHR, textStatus) {
+            Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
+        }
+    });
 };
 
 // ------------------------ COHESION DE LA PAGE ------------------------ //
@@ -813,13 +801,13 @@ Annuaire.preremplirFormulaireUpdateContact = function preremplirFormulaireUpdate
 			/* long */ var idAleatoire;
 			for (/* int */ var i in contact.personne.telephones) {
 				idAleatoire = new Date().getTime();
-				$('#formUpdateContactTelGroup ul').append('<li><span class="val label label-info">'+contact.personne.telephones[i][1]+'</span>&#09;'+Annuaire.afficherLibelle(contact.personne.telephones[i][0], 'labelVal')+'&#09;<a title="Supprimer" id="id'+idAleatoire+'" class="btn btn-danger btn-mini supprTel"><i class="icon-trash"></i></a></li>');
+				$('#formUpdateContactTelGroup ul').append('<li><span class="val label label-info">'+contact.personne.telephones[i].numero+'</span>&#09;'+Annuaire.afficherLibelle(contact.personne.telephones[i].intitule, 'labelVal')+'&#09;<a title="Supprimer" id="id'+idAleatoire+'" class="btn btn-danger btn-mini supprTel"><i class="icon-trash"></i></a></li>');
 				$('#formUpdateContactTelGroup ul').find('#id'+idAleatoire).click(function(event) {Annuaire.suppressionEntreeListe(event);});
 			}
 			
 			for (/* int */ var i in contact.personne.mails) {
 				idAleatoire = new Date().getTime();
-				$('#formUpdateContactEmailGroup ul').append('<li><span class="val label label-info">'+contact.personne.mails[i][1]+'</span>&#09;'+Annuaire.afficherLibelle(contact.personne.mails[i][0], 'labelVal')+'&#09;<a title="Supprimer" id="id'+idAleatoire+'" class="btn btn-danger btn-mini supprTel"><i class="icon-trash"></i></a></li>');
+				$('#formUpdateContactEmailGroup ul').append('<li><span class="val label label-info">'+contact.personne.mails[i].email+'</span>&#09;'+Annuaire.afficherLibelle(contact.personne.mails[i].intitule, 'labelVal')+'&#09;<a title="Supprimer" id="id'+idAleatoire+'" class="btn btn-danger btn-mini supprTel"><i class="icon-trash"></i></a></li>');
 				$('#formUpdateContactEmailGroup ul').find('#id'+idAleatoire).click(function(event) {Annuaire.suppressionEntreeListe(event);});
 			}
 			
@@ -869,11 +857,11 @@ Annuaire.initialiserTemplates = function initialiserTemplates() {
 		});
 	Handlebars.registerHelper('afficherEmail', function (mail) 
 		{ 
-			return new Handlebars.SafeString('<table><tr><td><a href="mailto:'+mail[1]+'">'+mail[1]+'</a></td><td>'+Annuaire.afficherLibelle(mail[0], '')+'</td></tr></table>');
+			return new Handlebars.SafeString('<table><tr><td><a href="mailto:'+mail.email+'">'+mail.email+'</a></td><td>'+Annuaire.afficherLibelle(mail.intitule, '')+'</td></tr></table>');
 		});
 	Handlebars.registerHelper('afficherTel', function (tel) 
 		{ 
-			return new Handlebars.SafeString('<table><tr><td>'+tel[1]+'</td><td>'+Annuaire.afficherLibelle(tel[0], '')+'</td></tr></table>');
+			return new Handlebars.SafeString('<table><tr><td>'+tel.numero+'</td><td>'+Annuaire.afficherLibelle(tel.intitule, '')+'</td></tr></table>');
 		});
 
 	Annuaire.templates['InfoEntreprise'] = Handlebars.compile($("#templateInfoEntreprise").html());
@@ -1025,12 +1013,13 @@ Annuaire.afficherInfoEntreprise = function afficherInfoEntreprise(/* objet */ do
 
     if( donnees.statut !== 'ok' ) {
         Annuaire.afficherErreur("Erreur : " +donnees.mesg);
+        return;
     }
 	Annuaire.infoEntrepriseCourante = donnees.entreprise;
 	donnees = donnees.entreprise;
 
 	// Génération du html par templating :
-	donnees.droitModification = Annuaire.droitModification;
+	donnees.droitModification = Annuaire.droitModification; // TODO gestion de la sécurité coté client? are you f***ing kidding me?
 	$(".module .hero-unit").html( Annuaire.templates['InfoEntreprise'](donnees) );
 
 	// Possibilité de trier les tables :
@@ -1092,13 +1081,13 @@ Annuaire.afficherInfoEntreprise = function afficherInfoEntreprise(/* objet */ do
 Annuaire.afficherResultatRechercheContacts = function afficherResultatRechercheContacts(/* objet */ donnees, /* array */ processedKeywords) {
 
 	// Gestion des erreurs :
-	if (donnees.code != 'ok' ) {
+	if (donnees.statut != 'ok' ) {
 		Annuaire.afficherErreur( donnees.mesg );
 		return;
 	}
 	
 	// Génération du html par templating :
-	donnees.droitModification = Annuaire.droitModification;
+	donnees.droitModification = Annuaire.droitModification; // TODO WTF?
 	$(".module .hero-unit").html( Annuaire.templates['SearchContact'](donnees) );
 
 	// Possibilité de trier les tables :

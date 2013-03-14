@@ -15,7 +15,7 @@ import javax.persistence.Entity;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@DiscriminatorValue("U")
+@DiscriminatorValue("1")
 public class Utilisateur extends Personne {
 
     @Length(max=35)

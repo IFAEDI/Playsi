@@ -9,6 +9,7 @@ import play.db.ebean.Model;
 import play.libs.Json;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +20,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER) // sinon bug sur les delete on cascade
 public class Personne extends Model {
 
     public Personne() {
@@ -62,10 +64,10 @@ public class Personne extends Model {
     protected String prenom;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "proprietaire")
-    protected List<Mail> mails;
+    protected List<Mail> mails = new ArrayList<Mail>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "proprietaire")
-    protected List<Telephone> telephones;
+    protected List<Telephone> telephones = new ArrayList<Telephone>();
 
     protected Boolean premiereConnexion;
     protected Role role;

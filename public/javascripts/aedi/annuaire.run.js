@@ -68,7 +68,7 @@ $('document').ready(function() {
 		/* int */ var idEntreprise = $('#formUpdateEntrepriseId').val();
 		
 		/* bool */ var nomModifie = false;
-		if (idEntreprise != 0) {
+		if (idEntreprise != -1) {
 			for (var /* int */ i in Annuaire.listeEntreprises) {
 				if (Annuaire.listeEntreprises[i][0] == idEntreprise) {
 					if (Annuaire.listeEntreprises[i][1] != value) {
@@ -80,9 +80,12 @@ $('document').ready(function() {
 		}
 		
 		var nomNonPris = true;
-		if ((idEntreprise == 0) || nomModifie) {
+		if ((idEntreprise == -1) || nomModifie) {
 			nomNonPris = false;
-            jsRoutes.controllers.Aedi.annuaireExisteEnteprise(value).ajax({
+
+            jsRoutes.controllers.Aedi.annuaireExisteEntreprise(value).ajax({
+                async: false,
+
 				success : function(donnees) {
 					if( donnees.statut == 'ok' ) {
 						nomNonPris = !donnees.dejaPris;
@@ -95,10 +98,9 @@ $('document').ready(function() {
 					Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur." );
 				}
 			});
+            return nomNonPris;
 		}
-		
-		return nomNonPris;
-	}).setMessage('validate_entreprise', 'Cette entreprise existe déja en BDD.');
+	}).setMessage('validate_entreprise', 'Cette entreprise existe déja.');
 	
 	// ---- Désactivation de l'envoi au serveur :
 	$('#formUpdateEntreprise').submit(function() {
@@ -249,7 +251,7 @@ $('document').ready(function() {
 	
 	
 	// Reset du formulaire d'entreprise :
-	$('#formUpdateEntreprise .reset').click( function () {resetForm($('#formUpdateEntreprise')); $('#formUpdateEntrepriseDescription').val(''); $('#formUpdateEntrepriseId').val(0);});
+	$('#formUpdateEntreprise .reset').click( function () {resetForm($('#formUpdateEntreprise')); $('#formUpdateEntrepriseDescription').val(''); $('#formUpdateEntrepriseId').val(-1);});
 	$('#modalUpdateEntreprise').on('hidden', function () {
 		$('.type-action').text("Ajout d'une entreprise");
 		$('#formUpdateEntreprise .error').html('');
@@ -275,7 +277,7 @@ $('document').ready(function() {
 	$('#recherche').css('height', (window.innerHeight - 290)+'px');
 	
 	// Initialisation de l'objet Annuaire :
-	Annuaire.droitModification = ($("#inputModif").val()==1)?true:false;
+	Annuaire.droitModification = ($("#inputModif").val()==1)?true:false; // TODO c'est une grosse blague
 	if (Annuaire.droitModification) { $('#formOptionsEdition').attr('checked', true); }
 	Annuaire.initialiserTemplates();
 	

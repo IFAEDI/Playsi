@@ -14,7 +14,7 @@
 
         var i = 0;
         @for( e <- listeEntreprises ) {
-        Annuaire.listeEntreprises[i++] = [@e.getId, @e.getNom];
+        Annuaire.listeEntreprises[i++] = [@e.getId, "@e.getNom"];
         }
         i = 0;
         @for( s <- listeSecteurs ) {
@@ -37,7 +37,13 @@
             <small><em>Ex : "entr:SociétéX Jean,nom:Mart , 0453"</em></small>
         </p>
     </div>
-    <input type="hidden" id="inputModif" name="inputModif" value=@droitEdition />
+    @* TODO sécurité... *@
+    @if( droitEdition ) {
+        <input type="hidden" id="inputModif" name="inputModif" value="1" />
+    } else {
+        <input type="hidden" id="inputModif" name="inputModif" value="0" />
+    }
+
     <div class="span2 columns">
         <div id="controleur">
             <div class="tabbable">
@@ -104,7 +110,7 @@
                     <a class="close reset" data-dismiss="modal">×</a>
                     <h3><span class="type-action">Ajout d'une entreprise</span> - Description générale</h3>
                 </div>
-                <input id="formUpdateEntrepriseId" value=0 type="hidden" />
+                <input id="formUpdateEntrepriseId" value=-1 type="hidden" />
                 <div class="modal-body">
 
                     <fieldset class="control-group">
@@ -598,7 +604,7 @@
 <span style="display: none;">{{categorie}}</span>{{traduireCategorieCommentaire categorie}}
 </td>
 <td>{{personne.prenom}} {{personne.nom}}</td>
-<td><small>{{traduireRole personne.role}}</small></td>
+<td><small>{{traduireRole personne.type}}</small></td>
 <td>{{timestamp}}</td>
 <td>{{contenu}}</td>
     {{#if ../droitModification}}

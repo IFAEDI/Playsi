@@ -34,9 +34,9 @@ public class Entreprise extends Model {
     @Length(max=50)
     private String secteur;
 
-    private String commentaire;
+    private String commentaire; // TODO vérifier que le champ commentaire de Entreprise est utilisé?
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "entreprise")
     private List<ContactEntreprise> contacts;
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -48,12 +48,12 @@ public class Entreprise extends Model {
         ObjectNode json = Json.newObject();
 
         ObjectNode jsonDescription = Json.newObject();
+        jsonDescription.put("id_entreprise", id);
         jsonDescription.put("nom", nom);
         jsonDescription.put("secteur", secteur);
         jsonDescription.put("description", description);
         jsonDescription.put("commentaire", commentaire);
-
-        json.put("description", description);
+        json.put("description", jsonDescription);
 
         ArrayNode jsonContacts = new ArrayNode(JsonNodeFactory.instance);
         for( ContactEntreprise ce : contacts ) {
