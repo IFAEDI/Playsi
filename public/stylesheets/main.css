@@ -9,10 +9,10 @@ p {
 }
 
 /* tablesorter */
-table thead .head {background:url(../img/symboles/bg.gif) left center no-repeat; cursor:pointer; padding-left:18px}
-table thead .desc {background:url(../img/symboles/desc.gif) left center no-repeat; cursor:pointer; padding-left:18px}
+table thead .head {background:url(../images/symboles/bg.gif) left center no-repeat; cursor:pointer; padding-left:18px}
+table thead .desc {background:url(../images/symboles/desc.gif) left center no-repeat; cursor:pointer; padding-left:18px}
 
-table thead .asc {background:url(../img/symboles/asc.gif) left center no-repeat; cursor:pointer; padding-left:18px}
+table thead .asc {background:url(../images/symboles/asc.gif) left center no-repeat; cursor:pointer; padding-left:18px}
  
 
 .module h1 {
