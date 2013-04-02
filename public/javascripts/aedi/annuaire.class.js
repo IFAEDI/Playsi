@@ -380,7 +380,7 @@ Annuaire.updaterContact = function updaterContact() {
 			if (donnees.id >= 0) { // Ajout d'un contact :
 				// On demande si l'utilisateur veut en ajouter tout de suite d'autres :
 				Annuaire.confirmerAction('Contact ajouté !<br/> Voulez-vous en ajouter d\'autres tout de suite ?', 'alert-success', function(id) {
-					$('#formUpdateContactEntrepriseId').val(id);
+					$('#formUpdateContactEntrepriseId').val(idEntrepriseActuelle);
 					$('#modalUpdateContact').modal('show');
 				}, donnees.id);
 			}
