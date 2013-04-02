@@ -116,6 +116,11 @@ $('document').ready(function() {
 	$('#modalUpdateEntreprise').on('shown', function (e) {
 		$('#formUpdateEntrepriseNom').focus();
 	})
+
+	// ---- Masquage du bouton de suppression en cas d'annulation de l'édition :
+	$('#modalUpdateEntreprise').on('hidden', function (e) {
+		$('#btnSupprimerEntreprise').css('display', 'none'); // On affiche le bouton de suppression qu'en cas d'édition et non d'ajout.
+	})
 	
 	// -- Update/Création Contact :
 	var validatorContact = new FormValidator('formUpdateContact', [{

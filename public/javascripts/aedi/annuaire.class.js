@@ -165,19 +165,21 @@ Annuaire.chercherContacts = function chercherContacts() {
  * id_entreprise : L'id de l'entreprise à supprimer
  */
 Annuaire.supprimerEntreprise = function supprimerEntreprise(id_entreprise) {
-    jsRoutes.controllers.Aedi.annuaireSupprimerEntreprise(id_entreprise).ajax({
-        success : function(resp) {
-            if( resp.statut == 'ok' ) {
-                window.location.reload();
-            }
-            else {
-                Annuaire.afficherErreur( resp.mesg );
-            }
-        },
-        error :  function(jqXHR, textStatus) {
-            Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
-        }
-    });
+	jsRoutes.controllers.Aedi.annuaireSupprimerEntreprise(id_entreprise).ajax({
+		success : function(resp) {
+		    if( resp.statut == 'ok' ) {
+			window.location.reload();
+		    }
+		    else {
+			Annuaire.afficherErreur( resp.mesg );
+		    }
+		},
+		error :  function(jqXHR, textStatus) {
+		    Annuaire.afficherErreur( "Une erreur est survenue lors de l'envoi de la requête au serveur : " + textStatus );
+		}
+	});
+
+	$('#btnSupprimerEntreprise').css('display', 'none'); // On affiche le bouton de suppression qu'en cas d'édition et non d'ajout.
 };
 
 /** 
@@ -264,6 +266,7 @@ Annuaire.updaterEntreprise = function updaterEntreprise() {
 	resetForm($('#formUpdateEntreprise'));
 	$('#formUpdateEntrepriseDescription').val('');
 	$('#formUpdateEntrepriseId').val(-1);
+	$('#btnSupprimerEntreprise').css('display', 'none'); // On affiche le bouton de suppression qu'en cas d'édition et non d'ajout.
 };
 
 /** 
@@ -753,6 +756,7 @@ Annuaire.preremplirFormulaireModifEntreprise = function preremplirFormulaireModi
 		$('#formUpdateEntrepriseDescription').val(Annuaire.infoEntrepriseCourante.description.description);
 	}
 	$('.type-action').text("Edition d'une entreprise");
+	$('#btnSupprimerEntreprise').css('display', 'inline'); // On affiche le bouton de suppression qu'en cas d'édition et non d'ajout.
 };
 
 /** 
