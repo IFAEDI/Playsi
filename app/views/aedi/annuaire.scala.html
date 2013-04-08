@@ -362,7 +362,7 @@
     {{/droitModification}}
     {{/contacts}}
     {{#if contacts}}
-<table class="table table-stripped tablesorter">
+<table id="contacts-table" class="table table-stripped"> 
 <thead>
     <tr>
     <th>Nom</th>
@@ -372,7 +372,7 @@
     <th>Tel</th>
     <th class="first">Lieu</th>
     <th>Priorité</th>
-    <th>
+    <th class="nosort">
         {{#droitModification}}
     <a data-toggle="modal" href="#modalUpdateContact" title="Ajouter Contact" class="btn  btn-mini btn-ajoutContact"><i class="icon-plus"></i></a>
         {{/droitModification}}
@@ -447,7 +447,7 @@
     Aucune relation.
     {{/relations}}
     {{#if relations}}
-<table class="table table-stripped tablesorter">
+<table  id="relations-table" class="table table-stripped"> 
 <tbody>
     {{^parrainage}}
 <tr>
@@ -582,15 +582,15 @@
     Aucun commentaire. <a data-toggle="modal" href="#modalAjoutCommentaire" title="Ajouter Commentaire" class="btn  btn-mini"><i class="icon-plus"></i></a>
     {{/commentaires}}
     {{#if commentaires}}
-<table class="table table-stripped tablesorter">
+<table id="remarques-table" class="table table-stripped"> 
 <thead>
 <tr>
-<th class="first"></th>
+<th sorter-extract="Annuaire.extraireContenuPourTriParBadge" class="first"></th>
 <th>Auteur</th>
 <th class="first">Poste</th>
 <th>Date</th>
 <th>Commentaires</th>
-<th>
+<th class="nosort">
     {{#droitModification}}
 <a data-toggle="modal" href="#modalAjoutCommentaire" title="Ajouter Commentaire" class="btn  btn-mini btn-ajoutCommentaire"><i class="icon-plus"></i></a>
     {{/droitModification}}
@@ -601,7 +601,7 @@
     {{#each commentaires}}
 <tr>
 <td class="first">
-<span style="display: none;">{{categorie}}</span>{{traduireCategorieCommentaire categorie}}
+{{traduireCategorieCommentaire categorie}} 
 </td>
 <td>{{personne.prenom}} {{personne.nom}}</td>
 <td><small>{{traduireRole personne.type}}</small></td>
@@ -630,7 +630,7 @@
     Aucun contact correspondant.
     {{/entreprises}}
     {{#if entreprises}}
-<table class="table table-stripped tablesorter">
+<table id="search-contacts-table" class="table table-stripped tablesorter"> 
 <thead>
     <tr>
     <th>Entreprise</th>
@@ -640,14 +640,14 @@
     <th>Email</th>
     <th>Tel</th>
     <th class="first">Lieu</th>
-    <th>Priorité</th>
-    <th></th>
+    <th sorter-extract="Annuaire.extraireContenuPourTriParRemarques">Priorité</th>
+    <!--<th class="nosort"></th>--> 
     </thead>
 <tbody>
     {{#each entreprises}}
     {{#each contacts}}
 <tr>
-<td class="entr"><a id-entreprise='{{../id}}' href="#{{../nom}}"><strong>{{../nom}}</strong></td>
+<td class="entreprise"><a id-entreprise='{{../id}}' href="#{{../nom}}"><strong>{{../nom}}</strong></td>
 <td class="nom"><strong>{{this.personne.nom}}</strong></td>
 <td class="prénom">{{personne.prenom}}</td>
 <td class="job"><em>{{fonction}}</em></td>
@@ -671,14 +671,14 @@
 </td>
 <td class="rem prio">
     {{#if commentaire}}
-<span rel="popover" data-content="{{commentaire}}" data-placement="bottom" data-original-title="Remarque" class="btn btn-mini btn-{{traduireCouleur priorite}}">{{traduirePrioriteContactTexte priorite}}</span>
+<span class="btn-{{traduireCouleur priorite}} btn btn-mini" rel="popover" data-content="{{commentaire}}" data-placement="bottom" data-original-title="Remarque">{{traduirePrioriteContactTexte priorite}}</span>
     {{/if}}
     {{#unless commentaire}}
-<span class="btn btn-mini btn-{{traduireCouleur priorite}}">{{traduirePrioriteContactTexte priorite}}</span>
+<span class="btn-{{traduireCouleur priorite}} btn btn-mini">{{traduirePrioriteContactTexte priorite}}</span> 
     {{/unless}}
 
 </td>
-    {{#if ../../droitModification}}
+    <!--{{#if ../../droitModification}} 
 <td>
 <a title="Editer Contact" id-contact={{id_contact}} data-toggle="modal" href="#modalUpdateContact" class="btn  btn-mini btn-modifContact">
 <i class="icon-pencil"></i>
@@ -687,7 +687,7 @@
 <i class="icon-remove"></i>
 </a>
 </td>
-    {{/if}}
+    {{/if}} -->
 </tr>
     {{/each}}
     {{/each}}
