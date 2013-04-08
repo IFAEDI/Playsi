@@ -217,6 +217,7 @@ Annuaire.updaterEntreprise = function updaterEntreprise() {
                     Annuaire.afficherListeEntreprises();
                     container = {'description' : description};
                     Annuaire.infoEntrepriseCourante = container;
+		    Annuaire.infoEntrepriseCourante.description.id_entreprise = donnees.id;
                     var objSimulantReponseServeur = { statut: "ok", entreprise: Annuaire.infoEntrepriseCourante};
                     Annuaire.afficherInfoEntreprise(objSimulantReponseServeur);
                     // On demande si l'utilisateur veut ajouter tout de suite des contacts :
